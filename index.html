@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <!--b1-->
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap" rel="stylesheet">
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+        <script type="importmap">
+            {
+                "imports": {
+                    "@material/web/": "https://esm.run/@material/web/"
+                }
+            }
+        </script>
+        <script type="module">
+            import '@material/web/all.js';
+            import {styles as typescaleStyles} from '@material/web/typography/md-typescale-styles.js';
+            document.adoptedStyleSheets.push(typescaleStyles.styleSheet);
+        </script>
+        <title>Vyzon 8</title>
+        <link rel="stylesheet" href="/assets/script/styles.css" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+        <meta name="apple-mobile-web-app-title" content="VyzonBETA">
+        <meta name="apple-mobile-web-app-capable" content="yes">
+        <link rel="apple-touch-icon" href="/assets/images/betalogo.png">
+        <meta name="HandheldFriendly" content="true" />
+    </head>
+    <body>
+        <div class="topmenu">
+            <!--<md-outlined-icon-button class="menubtn">
+                <md-icon>menu</md-icon>
+            </md-outlined-icon-button> -->
+            <h1 class="menutitle">Vyzon<span class="beta" style="color: red">BETA</span></h1>
+            <span style="position: relative">
+                <md-icon-button id="acc-anchor">
+                    <md-icon>account_circle</md-icon>
+                </md-icon-button>
+                <md-menu id="acc-menu" anchor="acc-anchor">
+                    <md-menu-item>
+                        <div slot="headline" onclick="logOut()">Log Out</div>
+                    </md-menu-item>
+                    <!--<md-menu-item>
+                        <div slot="headline">Change Password</div>
+                    </md-menu-item>
+                    <md-menu-item>
+                        <div slot="headline">Delete Account</div>
+                    </md-menu-item>-->
+                </md-menu>
+            </span>
+        </div>
+        <div class="content">
+            <div class="tasks">
+                <span class="notasks">You don't have any tasks.</span>
+                <md-fab aria-label="Add" class="addbtn" onclick="document.getElementById('addTask').show()">
+                    <md-icon slot="icon">add</md-icon>
+                </md-fab>
+                <md-circular-progress indeterminate class="loader" style="margin-top: 10px"></md-circular-progress>
+            </div>
+        </div>
+        <md-dialog id="addTask">
+            <div class="loaderoverlay"></div>
+            <div slot="headline">Create a task</div>
+            <form slot="content" id="addTaskForm" onsubmit="event.preventDefault(); addNewTask(); return false">
+                <md-outlined-text-field
+                    id="tasknamefield"
+                    class="field"
+                    label="Task Name"
+                    required
+                    error-text="Please add a task name">
+                </md-outlined-text-field>
+                <!--<md-outlined-text-field
+                    id="taskdatefield"
+                    type="date"
+                    class="field desc"
+                    label="Date">
+                </md-outlined-text-field> -->
+                <md-outlined-text-field
+                    id="taskdescfield"
+                    type="textarea"
+                    class="field desc"
+                    label="Description">
+                </md-outlined-text-field>
+            </form>
+            <div slot="actions">
+                <md-filled-button form="addTaskForm">Create</md-filled-button>
+            </div>
+          </md-dialog>
+    </body>
+    <script src="/assets/script/script.js"></script>
+</html>
