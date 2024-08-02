@@ -6,105 +6,147 @@
 body, html {
     margin: 0;
     padding: 0;
-    background: rgba(245,245,245);
+    background: var(--vyzon-full-bg);
 }
-:root {
-    --md-sys-color-primary: rgb(4,159,161);
-    --md-sys-color-on-primary: white;
-    --md-sys-color-on-primary-container: white;
-    --md-sys-color-secondary-container: rgb(4,159,161);
-    --md-sys-color-on-secondary-container: white;
-    --md-sys-color-surface-container-high: rgb(245,255,255);
-    --md-sys-color-surface-container-highest: rgb(215,255,255);
-    --md-sys-color-surface-container: rgb(215,255,255);
-    --md-sys-color-surface: rgb(215,255,255);
-    --md-sys-color-on-surface: black;
-    --md-sys-color-outline: black;
-    --md-sys-color-tertiary-container: black;
+* {
+    -webkit-user-select: none;
+    user-select: none;
+}
+
+md-dialog {
+    min-width: 600px;
 }
 md-icon {
     font-family: 'Material Symbols Rounded';
+    color: var(--vyzon-text);
+}
+.delpasswordbtn {
+    --md-sys-color-primary: rgb(255,100,100);
 }
 .content {
     display: flex;
     flex-direction: row;
     justify-content: center;
-    position: absolute;
+    position: fixed;
     bottom: 0;
     right: 0;
     width: calc(100% - 40px);
     height: calc(100% - 100px);
     padding: 20px;
 }
-.tasks {
+.taskswrapper {
     width: 100%;
     max-width: 700px;
     max-height: 500px;
     aspect-ratio: 7 / 5;
-    background: rgb(255,255,255);
+    position: relative;
+}
+.tasks {
+    width: 100%;
+    height: calc(100% - 55px);
+    background: var(--vyzon-bg);
     border-radius: 20px;
     transition: all 0.3s;
-    outline: 1px solid rgb(200,200,200);
-    position: relative;
+    outline: 1px solid var(--vyzon-outline);
     display: flex;
     flex-direction: column;
     align-items: center;
+    overflow: auto;
+    padding-top: 55px;
+    position: absolute;
+}
+#taskholder {
+    width: 100%;
 }
 .task {
     padding: 15px;
-    border-bottom: 1px solid rgb(200,200,200);
+    border-bottom: 1px solid var(--vyzon-outline-hard);
     display: flex;
     flex-direction: column;
     justify-content: center;
     width: calc(100% - 30px);
+    position: relative;
+}
+.task:last-child {
+    margin-bottom: 100px;
+}
+.label {
+    display: flex;
+    align-items: center;
+    position: absolute;
+    right: 0;
+    top: 0;
+    font-size: 15px;
+    font-family: 'Roboto';
+    padding: 5px;
+    padding-right: 10px;
+    color: var(--vyzon-text);
+}
+.label md-icon {
+    font-size: 18px;
+    font-variation-settings:
+        'FILL' 1;
+    color: var(--vyzon-text);
 }
 .task md-radio {
     margin-right: 15px;
 }
-.task label {
+.task .tlabel {
     font-family: 'Roboto';
     font-size: 16px;
     font-weight: 400;
-    color: rgb(0,0,0);
+    color: var(--vyzon-text-hard);
 }
 .task .descript {
     margin-top: 10px;
     font-family: 'Roboto';
     font-size: 13px;
     font-weight: 400;
-    color: rgb(75,75,75);
+    color: var(--vyzon-text);
 }
 .addbtn {
     position: absolute;
     bottom: 10px;
     right: 10px;
 }
+.feedbtn {
+    position: absolute;
+    bottom: 10px;
+    left: 10px;
+}
+.competebtn {
+    position: absolute;
+    bottom: 70px;
+    right: 10px;
+    --md-fab-small-container-shape: 10px;
+}
 .topmenu {
     display: flex;
     flex-direction: row;
-    position: absolute;
+    position: fixed;
     top: 0;
     right: 0;
-    background: rgba(255,255,255);
+    background: var(--vyzon-bg);
     height: 60px;
     align-items: center;
     width: 100%;
-    border-bottom: 1px solid rgb(200,200,200);
+    border-bottom: 1px solid var(--vyzon-outline);
+    z-index: 1;
 }
 .menubtn {
-    margin-right: 5px;
-    --md-outlined-icon-button-container-height: 50px;
-    --md-outlined-icon-button-container-width: 50px;
+    --md-outlined-icon-button-container-height: 40px;
+    --md-outlined-icon-button-container-width: 40px;
     --md-outlined-icon-button-icon-size: 25px;
     --md-sys-color-outline: transparent;
+    margin-left: 8px;
+    margin-right: 5px;
 }
 .menutitle {
     font-family: 'Roboto';
     font-size: 26px;
     margin: 0;
     font-weight: 400;
-    color: rgb(75,75,75);
-    margin-left: 15px;
+    color: var(--vyzon-text);
     margin-right: auto;
     display: flex;
     align-items: start;
@@ -121,16 +163,62 @@ md-icon {
 .field {
     width: 100%;
 }
+.group {
+    display: flex;
+    align-items: top;
+    gap: 8px;
+}
+.group md-outlined-button, .group md-filled-button {
+    height: 56px;
+    width: 56px;
+    --md-outlined-button-container-shape: 6px;
+}
+.group md-outlined-button md-icon, .group md-filled-button md-icon {
+    width: 100%;
+    height: 100%;
+    align-items: center;
+    justify-content: center;
+    font-variation-settings:
+        'FILL' 1;
+    color: var(--vyzon-text);
+    font-size: 30px;
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+.iconselect {
+    width: 50px;
+    height: 50px;
+}
+.iconselect md-icon {
+    font-size: 28px;
+    margin-top: 5px;
+    font-variation-settings:
+        'FILL' 1;
+    color: var(--vyzon-text);
+}
+.friendadd {
+    width: 50px;
+    height: 50px;
+    --md-filled-button-container-shape: 6px;
+}
+.friendadd md-icon {
+    font-size: 28px;
+    margin-top: 0px;
+    font-variation-settings:
+        'FILL' 1;
+    color: white !important;
+}
 .desc {
     margin-top: 10px;
     resize: none;
 }
-.field .desc md-select-option {
-    background-color: green;
+.undesc {
+    margin-top: -15px;
 }
 .notasks {
     font-family: 'Roboto';
-    color: rgb(100,100,100);
+    color: var(--vyzon-text-soft-alt);
     font-size: 15px;
     margin-top: 10px;
     display: none;
@@ -141,25 +229,197 @@ md-icon {
 #acc-anchor md-icon {
     font-size: 25px;
 }
+md-menu {
+    width: 1000px;
+}
+.listselect {
+    width: 100%;
+    position: absolute;
+    top: 0;
+}
+.pfp {
+    height: 40px;
+    margin-right: 3px;
+    border-radius: 50%;
+}
+.requests, .friends {
+    margin-top: 5px;
+    color: var(--vyzon-text-soft);
+}
+.request, .friend {
+    padding-left: 10px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    font-size: 17px;
+    display: flex;
+    gap: 5px;
+    align-items: center;
+    border-bottom: 1px solid var(--vyzon-outline);
+    color: var(--vyzon-text);
+}
+.request md-filled-icon-button, .friend md-icon-button, .request md-icon-button {
+    margin-left: auto;
+}
+.floaddiv {
+    display: flex;
+    justify-content: center;
+}
+.roaster {
+    color: var(--vyzon-text-hard);
+    width: 100%;
+    font-weight: bold;
+    display: block;
+}
+.sectionhead {
+    color: var(--vyzon-text);
+}
+.ferror {
+    color: red;
+    margin-top: 10px;
+}
+.switchlabel {
+    font-size: 18px;
+}
+.switch {
+    display: flex;
+    align-items: center;
+}
+.switch:not(:first-child) {
+    margin-top: 10px;
+}
+.switch md-switch {
+    margin-left: auto;
+}
+#settings {
+    min-width: 300px;
+}
+.competition {
+    font-family: 'Roboto';
+    outline: 1px solid var(--vyzon-outline);
+    border-radius: 10px;
+    padding: 0 5px;
+    padding-bottom: 2px;
+    color: var(--vyzon-text);
+    margin-right: 10px;
+    position: relative;
+    display: none;
+}
+.cname {
+    font-size: 10px;
+}
+.indicator {
+    display: flex;
+    flex-direction: row;
+    gap: 5px;
+}
+.names {
+    display: flex;
+    flex-direction: column;
+    font-size: 12px;
+}
+.progress {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+.progress md-linear-progress {
+    --md-linear-progress-track-height: 7px;
+    --md-linear-progress-active-indicator-height: 8px;
+    --md-linear-progress-track-shape: 8px;
+    --md-linear-progress-active-indicator-color: rgb(234,213,24);
+    --md-linear-progress-track-color: rgb(234,213,24,0.35);
+}
+.progress md-linear-progress:first-child {
+    margin-top: 3px;
+}
+.progress md-linear-progress:not(:first-child) {
+    margin-top: -2px;
+}
+.cwl {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    background: rgb(0,0,0,0.5);
+    border-radius: 10px;
+    font-size: 17px;
+    display: none;
+    animation: fadein 1s;
+}
+@keyframes fadein {
+    from { opacity: 0% }
+}
+.winreveal {
+    display: none;
+    flex-direction: column;
+    gap: 2px;
+    padding: 2px 0px;
+    padding: 10px;
+    cursor: pointer;
+    position: relative;
+    border-radius: 10px;
+    transform: scale(1.1)
+}
+.winname {
+    font-size: 13px;
+    color: var(--vyzon-text-hard);
+    text-align: center;
+}
+.tdismiss {
+    display: none;
+}
+#sendFeedback, #sendFeedbackConfirm {
+    --md-sys-color-primary: rgb(160,50,255);
+}
+#sendFeedbackForm md-outlined-select, md-outlined-text-field {
+    width: 100%;
+    --md-menu-item-selected-container-color: rgb(160,50,255,0.25);
+}
+#friendRequests {
+    background: var(--vyzon-accent);
+    color: white;
+    font-family: 'Roboto';
+    font-size: 12px;
+    border-radius: 50%;
+    display: none;
+    width: 20px;
+    height: 20px;
+    position: absolute;
+    align-items: center;
+    justify-content: center;
+    right: 0;
+    top: 0;
+    pointer-events: none;
+}
+.reloadbtn {
+    position: absolute;
+    right: 20px;
+    top: 20px;
+}
 
 /* Mobile */
 @media (max-width: 700px) {
     body, html {
-        background: white;
-    }
-    .topmenu {
-        border-bottom: 1px solid rgb(200,200,200);
+        background: var(--vyzon-full-bg);
     }
     .content {
         width: 100%;
         height: calc(100% - 60px);
         padding: 0px;
     }
-    .tasks {
+    .taskswrapper {
         max-width: 100%;
         max-height: 100%;
         outline: none;
         background: transparent;
+    }
+    .tasks {
+        border-radius: 0px;
     }
     .notasks {
         margin-top: 10px;
@@ -167,5 +427,36 @@ md-icon {
     .addbtn {
         bottom: 40px;
         right: 10px;
+    }
+    .feedbtn {
+        bottom: 40px;
+        left: 10px;
+    }
+    .competebtn {
+        bottom: 100px;
+    }
+    .tdismiss {
+        display: inline;
+    }
+    .cdismiss {
+        display: none;
+    }
+    .cfields {
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+    }
+    .cfields md-outlined-select {
+        max-width: 100%;
+        min-width: 100%;
+    }
+    .cfields md-outlined-text-field {
+        max-width: 100%;
+        min-width: 100%;
+    }
+}
+@media (max-width: 700px) {
+    md-dialog {
+        min-width: 90%;
     }
 }

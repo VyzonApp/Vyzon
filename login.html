@@ -40,6 +40,9 @@
             .field .desc md-select-option {
                 background-color: green;
             }
+            #status {
+                color: red;
+            }
         </style>
         <title>Login to Vyzon</title>
         <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -54,7 +57,8 @@
                     label="Username"
                     required
                     id="username"
-                    error-text="Please enter a valid username">
+                    error-text="Please enter a valid username"
+                    oninput="event.target.value = event.target.value.toLowerCase()">
                 </md-outlined-text-field>
                 <md-outlined-text-field
                     type="password"
@@ -91,10 +95,13 @@
                     location = "/"
                 } else if (statuscode == 401) {
                     document.getElementById("status").textContent = "Unauthorized.";
+                    document.getElementById("loginForm").reset();
                 } else if (statuscode == 404) {
                     document.getElementById("status").textContent = "User not found.";
+                    document.getElementById("loginForm").reset();
                 } else if (statuscode == 403) {
                     document.getElementById("status").textContent = "Incorrect password.";
+                    document.getElementById("loginForm").reset();
                 } else if (statuscode == 500) {
                     document.getElementById("status").textContent = "Internal Server Error.";
                 }

@@ -1,0 +1,8 @@
+SETTINGS REFERENCE
+0: Dark Mode
+1: Allow Friend Requests
+
+First: Year
+Second: Month
+Third: Release #, B if Beta release
+Fourth: Bug Fix #, blank if neccesary

@@ -40,6 +40,9 @@
             .field .desc md-select-option {
                 background-color: green;
             }
+            #status {
+                color: red;
+            }
         </style>
         <title>Register for Vyzon</title>
         <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -57,7 +60,8 @@
                     minlength="2"
                     maxlength="20"
                     id="username"
-                    error-text="Please enter a valid username">
+                    error-text="Please enter a valid username"
+                    oninput="event.target.value = event.target.value.toLowerCase()">
                 </md-outlined-text-field>
                 <md-outlined-text-field
                     type="password"
@@ -107,12 +111,15 @@
                         location = "/"
                     } else if (statuscode == 409) {
                         document.getElementById("status").textContent = "User already exists.";
+                        document.getElementById("loginForm").reset();
                     } else if (statuscode == 500) {
                         document.getElementById("status").textContent = "Internal Server Error.";
+                        document.getElementById("loginForm").reset();
                     }
                 })
             } else {
-                document.getElementById("remind").textContent = "Passwords do not match.";
+                document.getElementById("status").textContent = "Passwords do not match.";
+                document.getElementById("loginForm").reset();
             }
         }
 

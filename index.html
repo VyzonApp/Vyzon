@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <!--b1-->
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
         <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap" rel="stylesheet">
@@ -18,48 +17,219 @@
             import {styles as typescaleStyles} from '@material/web/typography/md-typescale-styles.js';
             document.adoptedStyleSheets.push(typescaleStyles.styleSheet);
         </script>
-        <title>Vyzon 8</title>
-        <link rel="stylesheet" href="/assets/script/styles.css" />
+        <title>Vyzon</title>
+        <link rel="stylesheet" id="styleelem" href="" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-        <meta name="apple-mobile-web-app-title" content="VyzonBETA">
+        <meta name="apple-mobile-web-app-title" content="Vyzon">
         <meta name="apple-mobile-web-app-capable" content="yes">
-        <link rel="apple-touch-icon" href="/assets/images/betalogo.png">
+        <link rel="apple-touch-icon" href="/assets/images/logo.png">
+        <link rel="icon" type="image/png" sizes="32x32" href="/assets/images/favicon-32x32.png">
+        <link rel="icon" type="image/png" sizes="16x16" href="/assets/images/favicon-16x16.png">
+        <link rel="icon" type="image/x-icon" href="/assets/images/favicon.ico">
+        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+        <style>
+            .openinfo {
+                position: fixed;
+                top: 0;
+                left: 0;
+                z-index: 10000;
+                background: white;
+                width: 100%;
+                height: 100%;
+            }
+            @keyframes oipulse {
+                0% {
+                    transform: scale(100%);
+                }
+                50% {
+                    transform: scale(110%);
+                }
+                100% {
+                    transform: scale(100%);
+                }
+            }
+        </style>
         <meta name="HandheldFriendly" content="true" />
+        <style> /* Base Definition */
+            :root {
+                --md-sys-color-primary: rgb(4,159,161);
+                --md-sys-color-on-primary: var(--vyzon-text-on-accent);
+                --md-sys-color-on-primary-container: var(--vyzon-text-hard);
+                --md-sys-color-secondary-container: rgb(4,159,161,0.25);
+                --md-sys-color-on-secondary-container: var(--vyzon-text-hard);
+                --md-sys-color-surface-container-high: var(--vyzon-bg-alt);
+                --md-sys-color-surface-container-highest: rgb(4,159,161,0.15);
+                --md-sys-color-surface-container: var(--vyzon-bg-alt);
+                --md-sys-color-surface: var(--vyzon-bg-alt);
+                --md-sys-color-on-surface: var(--vyzon-text-hard);
+                --md-sys-color-on-surface-variant: var(--vyzon-text);
+                --md-sys-color-outline: var(--vyzon-text-hard);
+                --md-sys-color-outline-variant: var(--vyzon-text-hard);
+                --md-sys-color-tertiary-container: var(--vyzon-text-hard);
+                --md-filled-button-label-text-color: var(--vyzon-text-on-accent);
+                --md-dialog-container-color: var(--vyzon-bg-alt2);
+                --md-primary-tab-container-color: var(--vyzon-bg-alt2);
+
+                --vyzon-accent: rgb(4,159,161);
+            }
+        </style>
+        <style id="dmodestyle"> /* Dark Mode */
+            :root {
+                --vyzon-full-bg: rgba(20,20,20);
+                --vyzon-bg: transparent;
+                --vyzon-bg-alt: rgba(50,50,50);
+                --vyzon-bg-alt2: rgb(25,25,25);
+                --vyzon-outline: rgb(150,150,150);
+                --vyzon-outline-hard: white;
+                --vyzon-text: rgb(200,200,200);
+                --vyzon-text-hard: white;
+                --vyzon-text-soft: rgb(75,75,75);
+                --vyzon-text-soft-alt: rgb(150,150,150);
+                --vyzon-text-on-accent: rgb(255,255,255);
+            }
+            .taskswrapper::after {
+                content: "";
+                position: absolute;
+                border-radius: 5000px;
+                top: 175px;
+                left: 50%;
+                box-shadow: 0 0 500px 200px rgb(4,255,255,0.25);
+            }
+            .topmenu {
+                border-bottom: 1px solid transparent;
+            }
+            .topmenu:after {
+                content: "";
+                bottom: -1px;
+                left: 0;
+                width: 100%;
+                height: 1px;
+                position: absolute;
+                background: linear-gradient(90deg, rgb(4,255,255,0.05), rgb(4,255,255,0.75), rgb(4,255,255,0.05))
+            }
+            .feedbtn md-icon {
+                color: rgb(200, 130, 255);
+            }
+            @media (max-width: 700px) {
+                .topmenu {
+                    border-bottom: 1px solid transparent;
+                }
+                .topmenu::after {
+                    background: transparent;
+                }
+                .taskswrapper::after {
+                    top: 200px;
+                    box-shadow: 0 0 250px 150px rgb(4,255,255,0.5);
+                }
+            }
+        </style>
+        <style id="lmodestyle"> /* Light Mode */
+            :root {
+                --vyzon-full-bg: rgba(245,245,245);
+                --vyzon-bg: rgb(255,255,255);
+                --vyzon-bg-alt: rgb(235,255,255);
+                --vyzon-bg-alt2: rgb(255,255,255);
+                --vyzon-outline: rgb(200,200,200);
+                --vyzon-outline-hard: black;
+                --vyzon-text: rgb(75,75,75);
+                --vyzon-text-hard: black;
+                --vyzon-text-soft: rgb(75,75,75);
+                --vyzon-text-soft-alt: rgb(100,100,100);
+                --vyzon-text-on-accent: rgb(255,255,255);
+            }
+            .feedbtn {
+                --md-fab-container-color: rgb(240,200,255);
+            }
+        </style>
     </head>
     <body>
+        <div class="openinfo"></div>
         <div class="topmenu">
-            <!--<md-outlined-icon-button class="menubtn">
-                <md-icon>menu</md-icon>
-            </md-outlined-icon-button> -->
-            <h1 class="menutitle">Vyzon<span class="beta" style="color: red">BETA</span></h1>
             <span style="position: relative">
-                <md-icon-button id="acc-anchor">
+                <md-icon-button class="menubtn" id="menu-anchor">
+                    <md-icon>menu</md-icon>
+                    <span id="friendRequests">1</span>
+                </md-icon-button>
+                <md-menu id="menu-menu" anchor="menu-anchor">
+                    <md-menu-item>
+                        <div slot="headline" onclick="friendListOpen()">Friends</div>
+                    </md-menu-item>
+                    <md-menu-item>
+                        <div slot="headline" onclick="document.getElementById('settings').show()">Settings</div>
+                    </md-menu-item>
+                </md-menu>
+            </span>
+            <h1 class="menutitle">Vyzon<span class="beta" style="color: red; display: none">BETA</span></h1>
+
+            <div class="competition" id="competition">
+                <div class="stats" id="cstats">
+                    <span class="cname" id="cname"></span>
+                    <div class="indicator">
+                        <div class="names">
+                            <span></span>
+                            <span id="user2name"></span>
+                        </div>
+                        <div class="progress">
+                            <md-linear-progress id="bar1"></md-linear-progress>
+                            <md-linear-progress id="bar2"></md-linear-progress>
+                        </div>
+                    </div>
+                </div>
+                <div class="winreveal" id="creveal" onclick="document.getElementById('competition').style.display = 'none'">
+                    <span class="winname"><span id="winneruser">zakem</span> won!<br><span class="cdismiss">Click</span><span class="tdismiss">Tap</span> to dismiss.</span>
+                    <md-ripple></md-ripple>
+                </div>
+                <div class="cwl" id="win">You won!</div>
+                <div class="cwl" id="lose">You lost. :(</div>
+            </div>
+
+            <span style="position: relative">
+                <md-icon-button id="acc-anchor" onclick="document.getElementById('accountInfo').show()">
                     <md-icon>account_circle</md-icon>
                 </md-icon-button>
-                <md-menu id="acc-menu" anchor="acc-anchor">
+                <md-menu anchor="acc-anchor" onclick="document.getElementById('addTask').show()">
                     <md-menu-item>
                         <div slot="headline" onclick="logOut()">Log Out</div>
                     </md-menu-item>
-                    <!--<md-menu-item>
-                        <div slot="headline">Change Password</div>
+                    <md-menu-item>
+                        <div slot="headline" onclick="document.getElementById('changePassword').show()">Change Password</div>
                     </md-menu-item>
                     <md-menu-item>
-                        <div slot="headline">Delete Account</div>
-                    </md-menu-item>-->
+                        <div slot="headline" onclick="document.getElementById('deleteAccount').show()">Delete Account</div>
+                    </md-menu-item>
                 </md-menu>
             </span>
         </div>
         <div class="content">
-            <div class="tasks">
-                <span class="notasks">You don't have any tasks.</span>
-                <md-fab aria-label="Add" class="addbtn" onclick="document.getElementById('addTask').show()">
+            <div class="taskswrapper">
+                <div class="tasks">
+                    <md-filled-select class="listselect" onchange="listSwitch()" id="listselect">
+                        <md-select-option selected value="0">
+                            <div slot="headline">Main List</div>
+                        </md-select-option>
+                        <md-select-option value="new" id="newlist">
+                            <div slot="headline"><i>Add new list...</i></div>
+                        </md-select-option>
+                        <md-select-option value="del" id="dellist">
+                            <div slot="headline"><i>Delete list...</i></div>
+                        </md-select-option>
+                    </md-filled-select>
+                    <span class="notasks">You don't have any tasks on this list.</span>
+                    <div id="taskholder"></div>
+                    <md-circular-progress indeterminate class="loader" style="margin-top: 10px"></md-circular-progress>
+                </div>
+                <md-fab id="feedbtn" class="feedbtn" onclick="document.getElementById('sendFeedback').show()">
+                    <md-icon slot="icon">feedback</md-icon>
+                </md-fab>
+                <!--<md-fab size="small" class="competebtn" onclick="readyCompetition()">
+                    <md-icon slot="icon">joystick</md-icon>
+                </md-fab>-->
+                <md-fab class="addbtn" onclick="document.getElementById('addTask').show()">
                     <md-icon slot="icon">add</md-icon>
                 </md-fab>
-                <md-circular-progress indeterminate class="loader" style="margin-top: 10px"></md-circular-progress>
             </div>
         </div>
         <md-dialog id="addTask">
-            <div class="loaderoverlay"></div>
             <div slot="headline">Create a task</div>
             <form slot="content" id="addTaskForm" onsubmit="event.preventDefault(); addNewTask(); return false">
                 <md-outlined-text-field
@@ -69,12 +239,15 @@
                     required
                     error-text="Please add a task name">
                 </md-outlined-text-field>
-                <!--<md-outlined-text-field
-                    id="taskdatefield"
-                    type="date"
-                    class="field desc"
-                    label="Date">
-                </md-outlined-text-field> -->
+                <div class="group desc">
+                    <md-outlined-button onclick="event.preventDefault(); iconSelect()"><md-icon id="selectoricon">star</md-icon></md-outlined-button>
+                    <md-outlined-text-field
+                        id="tasklabelfield"
+                        type="text"
+                        class="field"
+                        label="Label">
+                    </md-outlined-text-field>
+                </div>
                 <md-outlined-text-field
                     id="taskdescfield"
                     type="textarea"
@@ -85,7 +258,275 @@
             <div slot="actions">
                 <md-filled-button form="addTaskForm">Create</md-filled-button>
             </div>
-          </md-dialog>
+        </md-dialog>
+        <md-dialog id="addList">
+            <div slot="headline">Create a list</div>
+            <form slot="content" id="addListForm" onsubmit="event.preventDefault(); addNewList(); return false">
+                <md-outlined-text-field
+                    id="listnamefield"
+                    class="field"
+                    label="List Name"
+                    required
+                    error-text="Please add a list name">
+                </md-outlined-text-field>
+            </form>
+            <div slot="actions">
+                <md-filled-button form="addListForm">Create</md-filled-button>
+            </div>
+        </md-dialog>
+        <md-dialog id="iconSelect">
+            <div slot="headline">Select an icon</div>
+            <form slot="content" id="iconSelectForm" class="undesc" onsubmit="event.preventDefault(); return false">
+                <md-text-button class="iconselect" onclick="returnIcon();"><md-icon>star</md-icon></md-text-button>
+                <md-text-button class="iconselect" onclick="returnIcon();"><md-icon>bolt</md-icon></md-text-button>
+                <md-text-button class="iconselect" onclick="returnIcon();"><md-icon>block</md-icon></md-text-button>
+                <md-text-button class="iconselect" onclick="returnIcon();"><md-icon>paid</md-icon></md-text-button>
+                <md-text-button class="iconselect" onclick="returnIcon();"><md-icon>sell</md-icon></md-text-button>
+                <md-text-button class="iconselect" onclick="returnIcon();"><md-icon>fitness_center</md-icon></md-text-button>
+                <md-text-button class="iconselect" onclick="returnIcon();"><md-icon>shopping_cart</md-icon></md-text-button>
+                <md-text-button class="iconselect" onclick="returnIcon();"><md-icon>schedule</md-icon></md-text-button>
+                <md-text-button class="iconselect" onclick="returnIcon();"><md-icon>event_note</md-icon></md-text-button>
+            </form>
+        </md-dialog>
+        <md-dialog id="delList">
+            <div slot="headline">Delete a list</div>
+            <form slot="content" id="delListForm" onsubmit="event.preventDefault(); deleteList(); return false">
+                <md-outlined-select id="dellistselectfield" required error-text="Please specify a list" style="width:100%">
+                    <md-select-option selected disabled>
+                        <div slot="headline">Select an option...</div>
+                    </md-select-option>
+                </md-outlined-select>
+            </form>
+            <div slot="actions">
+                <md-filled-button form="delListForm">Delete</md-filled-button>
+            </div>
+        </md-dialog>
+        <md-dialog id="changePassword">
+            <div slot="headline">Change password</div>
+            <form slot="content" id="changePasswordForm" onsubmit="event.preventDefault(); changePassword(); return false">
+                <div slot="headline" class="undesc" id="cperror"></div>
+                <md-outlined-text-field
+                    id="newpassword"
+                    class="field desc"
+                    type="password"
+                    label="New Password"
+                    required
+                    error-text="Your password must be\n8 characters minimum\n30 characters maximum\nCan't contain spaces"
+                    minlength="8" maxlength="20" pattern="^\S*$">
+                </md-outlined-text-field>
+                <md-outlined-text-field
+                    id="confirmpassword"
+                    class="field desc"
+                    type="password"
+                    label="Confirm Password"
+                    required
+                    error-text="Password does not match.">
+                </md-outlined-text-field>
+                <div slot="headline" class="desc">Your password must meet the following requirements:<br>
+                    8 characters minimum<br>
+                    30 characters maximum<br>
+                    Can't contain spaces
+                </div>
+            </form>
+            <div slot="actions">
+                <md-filled-button form="changePasswordForm">Change Password</md-filled-button>
+            </div>
+        </md-dialog>
+        <md-dialog id="deleteAccount">
+            <div slot="headline">Delete Account</div>
+            <form slot="content" id="deleteAccountForm" onsubmit="event.preventDefault(); deleteAccount(); return false">
+                <div class="desc">This action will delete all your data and is irreversible.</div>
+                <div style="color: red">Are you sure you want to proceed?</div>
+            </form>
+            <div slot="actions">
+                <md-filled-button form="deleteAccountForm" class="delpasswordbtn">Delete</md-filled-button>
+            </div>
+        </md-dialog>
+        <md-dialog id="accountInfo">
+            <div slot="headline">
+                <img src="/assets/images/profile.svg" class="pfp" /> <span id="usernameacc"></span>
+                <md-icon-button onclick="location.reload()" class="reloadbtn"><md-icon>refresh</md-icon></md-icon-button>
+            </div>
+            <form slot="content" id="accountModal" onsubmit="event.preventDefault(); document.getElementById('accountInfo').close(); return false">
+                <md-menu>
+                    <md-menu-item>
+                        <div slot="headline" onclick="logOut()">Log Out</div>
+                    </md-menu-item>
+                    <md-menu-item>
+                        <div slot="headline" onclick="document.getElementById('changePassword').show()">Change Password</div>
+                    </md-menu-item>
+                    <md-menu-item>
+                        <div slot="headline" onclick="document.getElementById('deleteAccount').show()">Delete Account</div>
+                    </md-menu-item>
+                </md-menu>
+                <md-tabs>
+                    <md-primary-tab selected style="display:none"></md-primary-tab>
+                    <md-primary-tab onclick="document.getElementById('accountInfo').close(); document.getElementById('deleteAccount').show()">
+                        <md-icon slot="icon">delete</md-icon>
+                        Delete Account
+                    </md-primary-tab>
+                    <md-primary-tab onclick="document.getElementById('accountInfo').close(); document.getElementById('changePassword').show()">
+                        <md-icon slot="icon">lock</md-icon>
+                        Change Password
+                    </md-primary-tab>
+                </md-tabs>
+            </form>
+            <div slot="actions">
+                <md-text-button onclick="logOut()">Log Out</md-text-button>
+                <md-filled-button form="accountModal">Close</md-filled-button>
+            </div>
+        </md-dialog>
+        <md-dialog id="friendList">
+            <div slot="headline">Social</div>
+            <div slot="content">
+                <form class="group" onsubmit="event.preventDefault(); addFriend(); return false">
+                    <md-outlined-text-field
+                        id="addfriendfield"
+                        type="text"
+                        class="field"
+                        label="Add a friend by username..."
+                        required>
+                    </md-outlined-text-field>
+                    <md-filled-button class="friendadd" id="friendaddbtn"><md-icon>add</md-icon></md-filled-button>
+                </form>
+                <span class="ferror" id="ferror"></span>
+                <span>This feature does...nothing. I promise that's not going to be the case forever. For now, add your friends!</span>
+                <div class="requests">
+                    <span class="sectionhead">Pending Requests</span>
+                    <span class="roaster" id="roast1"></span>
+                    <div class="floaddiv">
+                        <md-circular-progress indeterminate id="cpf1"></md-circular-progress>
+                    </div>
+                    <div id="finc"></div>
+                    <div id="fout"></div>
+                </div>
+                <div class="friends">
+                    <span class="sectionhead">Your Friends</span>
+                    <span class="roaster" id="roast2"></span>
+                    <div class="floaddiv">
+                        <md-circular-progress indeterminate id="cpf2"></md-circular-progress>
+                    </div>
+                    <div id="friendRows"></div>
+                </div>
+            </div>
+        </md-dialog>
+        <md-dialog id="settings">
+            <div slot="headline">
+                <span style="flex: 1;">Settings</span>
+                <md-icon-button onclick="event.preventDefault();event.target.parentElement.parentElement.close()">
+                    <md-icon>close</md-icon>
+                </md-icon-button>
+            </div>
+            <form id="settingsContent" slot="content">
+                <label class="switch">
+                    <span class="switchlabel">Dark Mode</span>
+                    <md-switch id="setting0" onchange="setSetting(0, event.target.selected)"></md-switch>
+                </label>
+                <label class="switch">
+                    <span class="switchlabel">Allow Friend Requests</span>
+                    <md-switch id="setting1" selected onchange="setSetting(1, event.target.selected)"></md-switch>
+                </label>
+                <label class="switch">
+                    <span class="switchlabel">Enable Feedback</span>
+                    <md-switch id="setting2" selected onchange="setSetting(2, event.target.selected)"></md-switch>
+                </label>
+            </form>
+        </md-dialog>
+        <md-dialog id="startCompetition">
+            <div slot="headline">Request Competition</div>
+            <form slot="content" id="startCompetitionForm" class="undesc" onsubmit="event.preventDefault(); sendCompetitionRequest(); return false">
+                <label>Friend to Compete Against</label>
+                <div class="cfields" style="display: flex; gap: 10px; margin-bottom: 10px">
+                    <md-outlined-select
+                        id="ctaskAgainst"
+                        style="width: 50%;">
+                    </md-outlined-select>
+                    <md-outlined-text-field
+                        label="Competition Name"
+                        id="tasksAmount"
+                        style="width: 50%"
+                        required>
+                    </md-outlined-text-field>
+                </div>
+                <label>Amount of Tasks</label>
+                <md-slider
+                    labeled
+                    min="0"
+                    max="50"
+                    value="25"
+                    id="tasksAmount"
+                    style="width: 100%">
+                </md-slider>
+            </form>
+            <div slot="actions">
+                <md-filled-button form="startCompetitionForm">Send</md-filled-button>
+            </div>
+        </md-dialog>
+        <md-dialog id="sendFeedback">
+            <div slot="headline">Send Feedback</div>
+            <form slot="content" id="sendFeedbackForm" class="undesc" onsubmit="event.preventDefault(); sendFeedback(); return false">
+                What type of feedback do you intend to submit?
+                <md-outlined-select required id="fType" onchange="feedbackEmail()">
+                    <md-select-option value="suggestion">Suggestion</md-select-option>
+                    <md-select-option value="bug">Bug Report</md-select-option>
+                    <md-select-option value="support">Support Request</md-select-option>
+                    <md-select-option value="other">Other</md-select-option>
+                </md-outlined-select>
+                <md-outlined-text-field id="fEmail"
+                    placeholder="Email"
+                    class="desc"
+                    type="email">
+                </md-outlined-text-field>
+                <md-outlined-text-field id="fTitle"
+                    placeholder="Title"
+                    class="desc"
+                    required>
+                </md-outlined-text-field>
+                <md-outlined-text-field id="fText"
+                    placeholder="Tell us your feedback..."
+                    class="desc"
+                    type="textarea"
+                    rows="4"
+                    required>
+                </md-outlined-text-field>
+            </form>
+            <div slot="actions">
+                <md-filled-button form="sendFeedbackForm">Send</md-filled-button>
+            </div>
+        </md-dialog>
+        <md-dialog id="sendFeedbackConfirm">
+            <div slot="headline">Thank you for your feedback!</div>
+            <div slot="content">
+                <div>We really, really appreciate your contribution to Vyzon. The team will look through this and try to resolve your issue. If you provided an email, we may follow up asking for more info.</div>
+            </div>
+            <div slot="actions">
+                <md-filled-button onclick="document.getElementById('sendFeedbackConfirm').close()">Close</md-filled-button>
+            </div>
+        </md-dialog>
+
+        <md-dialog id="loginNotice" onclose="event.preventDefault()">
+            <div slot="headline">You're not logged in.</div>
+            <div slot="content">
+                <div>To access Vyzon, you need to either log in or create an account.</div>
+            </div>
+            <div slot="actions">
+                <a class="notlink" href="/register.html"><md-text-button>Register</md-text-button></a>
+                <a class="notlink" href="/login.html"><md-filled-button>Log In</md-filled-button></a>
+            </div>
+        </md-dialog>
     </body>
-    <script src="/assets/script/script.js"></script>
+
+    <script>
+        Version = "24.08.1.0";
+        if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+            document.getElementById("lmodestyle").media = "max-width: 1px";
+            document.getElementById("dmodestyle").media = "";
+            document.querySelector(".openinfo").style.background = "black";
+        }
+
+        var scpt = document.createElement("script");
+        scpt.src = "/assets/script/script.js?v=" + Version;
+        document.body.appendChild(scpt);
+        document.getElementById("styleelem").href = "/assets/script/styles.css?v=" + Version;
+    </script>
 </html>
