@@ -4,5 +4,5 @@ SETTINGS REFERENCE
 
 First: Year
 Second: Month
-Third: Release #, B if Beta release
+Third: Release #, B if Beta release, T if testing release
 Fourth: Bug Fix #, blank if neccesary

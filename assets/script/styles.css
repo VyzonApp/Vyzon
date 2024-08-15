@@ -8,17 +8,16 @@ body, html {
     padding: 0;
     background: var(--vyzon-full-bg);
 }
-* {
-    -webkit-user-select: none;
-    user-select: none;
-}
-
 md-dialog {
     min-width: 600px;
 }
 md-icon {
     font-family: 'Material Symbols Rounded';
     color: var(--vyzon-text);
+}
+md-menu {
+    z-index: 100000;
+    position: fixed;
 }
 .delpasswordbtn {
     --md-sys-color-primary: rgb(255,100,100);
@@ -34,6 +33,22 @@ md-icon {
     height: calc(100% - 100px);
     padding: 20px;
 }
+.topbtn {
+    height: 56px;
+    width: 56px;
+    border: none;
+    background: transparent;
+    position: absolute;
+    top: 0;
+    right: 0;
+    background: var(--vyzon-accent-15);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-left: 1px solid var(--vyzon-outline);
+    border-bottom: 1px solid var(--vyzon-outline-hard);
+    cursor: pointer;
+}
 .taskswrapper {
     width: 100%;
     max-width: 700px;
@@ -43,7 +58,7 @@ md-icon {
 }
 .tasks {
     width: 100%;
-    height: calc(100% - 55px);
+    height: calc(100% - 56px);
     background: var(--vyzon-bg);
     border-radius: 20px;
     transition: all 0.3s;
@@ -52,7 +67,7 @@ md-icon {
     flex-direction: column;
     align-items: center;
     overflow: auto;
-    padding-top: 55px;
+    padding-top: 56px;
     position: absolute;
 }
 #taskholder {
@@ -213,8 +228,8 @@ md-icon {
     margin-top: 10px;
     resize: none;
 }
-.undesc {
-    margin-top: -15px;
+*[slot=content] {
+    margin-top: -10px;
 }
 .notasks {
     font-family: 'Roboto';
@@ -233,9 +248,10 @@ md-menu {
     width: 1000px;
 }
 .listselect {
-    width: 100%;
+    width: calc(100% - 56px);
     position: absolute;
     top: 0;
+    left: 0;
 }
 .pfp {
     height: 40px;
@@ -257,7 +273,7 @@ md-menu {
     border-bottom: 1px solid var(--vyzon-outline);
     color: var(--vyzon-text);
 }
-.request md-filled-icon-button, .friend md-icon-button, .request md-icon-button {
+.request md-filled-icon-button, .friend .menuwrap, .request md-icon-button {
     margin-left: auto;
 }
 .floaddiv {
@@ -289,9 +305,6 @@ md-menu {
 }
 .switch md-switch {
     margin-left: auto;
-}
-#settings {
-    min-width: 300px;
 }
 .competition {
     font-family: 'Roboto';
@@ -373,6 +386,9 @@ md-menu {
 .tdismiss {
     display: none;
 }
+.competitionbutton {
+    --md-sys-color-primary: rgb(255,200,0);
+}
 #sendFeedback, #sendFeedbackConfirm {
     --md-sys-color-primary: rgb(160,50,255);
 }
@@ -400,6 +416,61 @@ md-menu {
     position: absolute;
     right: 20px;
     top: 20px;
+}
+.lsub {
+    font-size: 13px;
+    color: var(--vyzon-text-soft-alt);
+    display: flex;
+    align-items: center;
+    margin-bottom: -2px;
+}
+.lsub md-icon {
+    font-size: 17px;
+    margin-right: -1px;
+    margin-left: -5px;
+    color: var(--vyzon-text);
+}
+.settingsGroup {
+    display: none;
+}
+#settingsOptions {
+    margin-bottom: 10px;
+}
+#colorHolder {
+    display: flex;
+    gap: 5px;
+    margin-top: 5px;
+    margin-bottom: 5px;
+    flex-wrap: wrap;
+}
+.colorIcon {
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    cursor: pointer;
+    transition: transform 0.2s;
+    border: none;
+}
+.colorIcon:active {
+    transform: scale(0.95)
+}
+#etempid {
+    display: none;
+}
+.priorityt {
+    font-weight: 900 !important;
+}
+.compstatbar {
+    --md-linear-progress-track-height: 20px;
+    --md-linear-progress-active-indicator-height: 20px;
+    --md-linear-progress-track-shape: 20px;
+    --md-linear-progress-active-indicator-color: rgb(234,213,24);
+    --md-linear-progress-track-color: rgb(234,213,24,0.35);
+}
+.numstat {
+    display: block;
+    width: 100%;
+    text-align: right;
 }
 
 /* Mobile */
@@ -453,6 +524,10 @@ md-menu {
     .cfields md-outlined-text-field {
         max-width: 100%;
         min-width: 100%;
+    }
+    * {
+        -webkit-user-select: none;
+        user-select: none;
     }
 }
 @media (max-width: 700px) {

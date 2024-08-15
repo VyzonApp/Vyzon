@@ -22,10 +22,10 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
         <meta name="apple-mobile-web-app-title" content="Vyzon">
         <meta name="apple-mobile-web-app-capable" content="yes">
-        <link rel="apple-touch-icon" href="/assets/images/logo.png">
-        <link rel="icon" type="image/png" sizes="32x32" href="/assets/images/favicon-32x32.png">
-        <link rel="icon" type="image/png" sizes="16x16" href="/assets/images/favicon-16x16.png">
-        <link rel="icon" type="image/x-icon" href="/assets/images/favicon.ico">
+        <link rel="apple-touch-icon" href="/assets/images/nlogo.png">
+        <link rel="icon" type="image/png" sizes="32x32" href="/assets/images/nfavicon-32x32.png?v=2">
+        <link rel="icon" type="image/png" sizes="16x16" href="/assets/images/nfavicon-16x16.png?v=2">
+        <link rel="icon" type="image/x-icon" href="/assets/images/nfavicon.ico?v=2">
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
         <style>
             .openinfo {
@@ -50,15 +50,25 @@
             }
         </style>
         <meta name="HandheldFriendly" content="true" />
+        <style id="accentstyle"> /* Accents */
+            :root {
+                --vyzon-accent: rgb(4,159,161);
+                --vyzon-accent-75: rgb(4,159,161,0.75);
+                --vyzon-accent-50: rgb(4,159,161,0.75);
+                --vyzon-accent-25: rgb(4,159,161,0.25);
+                --vyzon-accent-15: rgb(4,159,161,0.15);
+                --vyzon-accent-05: rgb(4,159,161,0.05);
+            }
+        </style>
         <style> /* Base Definition */
             :root {
-                --md-sys-color-primary: rgb(4,159,161);
+                --md-sys-color-primary: var(--vyzon-accent);
                 --md-sys-color-on-primary: var(--vyzon-text-on-accent);
                 --md-sys-color-on-primary-container: var(--vyzon-text-hard);
-                --md-sys-color-secondary-container: rgb(4,159,161,0.25);
+                --md-sys-color-secondary-container: var(--vyzon-accent-25);
                 --md-sys-color-on-secondary-container: var(--vyzon-text-hard);
                 --md-sys-color-surface-container-high: var(--vyzon-bg-alt);
-                --md-sys-color-surface-container-highest: rgb(4,159,161,0.15);
+                --md-sys-color-surface-container-highest: var(--vyzon-accent-15);
                 --md-sys-color-surface-container: var(--vyzon-bg-alt);
                 --md-sys-color-surface: var(--vyzon-bg-alt);
                 --md-sys-color-on-surface: var(--vyzon-text-hard);
@@ -69,8 +79,9 @@
                 --md-filled-button-label-text-color: var(--vyzon-text-on-accent);
                 --md-dialog-container-color: var(--vyzon-bg-alt2);
                 --md-primary-tab-container-color: var(--vyzon-bg-alt2);
-
-                --vyzon-accent: rgb(4,159,161);
+            }
+            md-filled-icon-button md-icon {
+                color: var(--vyzon-text-on-accent);
             }
         </style>
         <style id="dmodestyle"> /* Dark Mode */
@@ -93,7 +104,7 @@
                 border-radius: 5000px;
                 top: 175px;
                 left: 50%;
-                box-shadow: 0 0 500px 200px rgb(4,255,255,0.25);
+                box-shadow: 0 0 500px 200px var(--vyzon-accent-25);
             }
             .topmenu {
                 border-bottom: 1px solid transparent;
@@ -105,7 +116,7 @@
                 width: 100%;
                 height: 1px;
                 position: absolute;
-                background: linear-gradient(90deg, rgb(4,255,255,0.05), rgb(4,255,255,0.75), rgb(4,255,255,0.05))
+                background: linear-gradient(90deg, var(--vyzon-accent-05), var(--vyzon-accent-75), var(--vyzon-accent-05))
             }
             .feedbtn md-icon {
                 color: rgb(200, 130, 255);
@@ -119,7 +130,7 @@
                 }
                 .taskswrapper::after {
                     top: 200px;
-                    box-shadow: 0 0 250px 150px rgb(4,255,255,0.5);
+                    box-shadow: 0 0 250px 150px var(--vyzon-accent-50);
                 }
             }
         </style>
@@ -127,7 +138,7 @@
             :root {
                 --vyzon-full-bg: rgba(245,245,245);
                 --vyzon-bg: rgb(255,255,255);
-                --vyzon-bg-alt: rgb(235,255,255);
+                --vyzon-bg-alt: rgb(255,255,255);
                 --vyzon-bg-alt2: rgb(255,255,255);
                 --vyzon-outline: rgb(200,200,200);
                 --vyzon-outline-hard: black;
@@ -152,7 +163,10 @@
                 </md-icon-button>
                 <md-menu id="menu-menu" anchor="menu-anchor">
                     <md-menu-item>
-                        <div slot="headline" onclick="friendListOpen()">Friends</div>
+                        <div slot="headline" onclick="document.getElementById('newVersion').show()">News</div>
+                    </md-menu-item>
+                    <md-menu-item>
+                        <div slot="headline" onclick="friendListOpen()">Social</div>
                     </md-menu-item>
                     <md-menu-item>
                         <div slot="headline" onclick="document.getElementById('settings').show()">Settings</div>
@@ -166,7 +180,7 @@
                     <span class="cname" id="cname"></span>
                     <div class="indicator">
                         <div class="names">
-                            <span></span>
+                            <span>You</span>
                             <span id="user2name"></span>
                         </div>
                         <div class="progress">
@@ -175,7 +189,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="winreveal" id="creveal" onclick="document.getElementById('competition').style.display = 'none'">
+                <div class="winreveal" id="creveal" onclick="dismissCompetition()">
                     <span class="winname"><span id="winneruser">zakem</span> won!<br><span class="cdismiss">Click</span><span class="tdismiss">Tap</span> to dismiss.</span>
                     <md-ripple></md-ripple>
                 </div>
@@ -214,6 +228,10 @@
                             <div slot="headline"><i>Delete list...</i></div>
                         </md-select-option>
                     </md-filled-select>
+                    <button class="topbtn" onclick="getTasks(CurrentList);">
+                        <md-icon>refresh</md-icon>
+                        <md-ripple></md-ripple>
+                    </button>
                     <span class="notasks">You don't have any tasks on this list.</span>
                     <div id="taskholder"></div>
                     <md-circular-progress indeterminate class="loader" style="margin-top: 10px"></md-circular-progress>
@@ -221,9 +239,9 @@
                 <md-fab id="feedbtn" class="feedbtn" onclick="document.getElementById('sendFeedback').show()">
                     <md-icon slot="icon">feedback</md-icon>
                 </md-fab>
-                <!--<md-fab size="small" class="competebtn" onclick="readyCompetition()">
+                <md-fab size="small" class="competebtn" onclick="readyCompetition()">
                     <md-icon slot="icon">joystick</md-icon>
-                </md-fab>-->
+                </md-fab>
                 <md-fab class="addbtn" onclick="document.getElementById('addTask').show()">
                     <md-icon slot="icon">add</md-icon>
                 </md-fab>
@@ -240,7 +258,7 @@
                     error-text="Please add a task name">
                 </md-outlined-text-field>
                 <div class="group desc">
-                    <md-outlined-button onclick="event.preventDefault(); iconSelect()"><md-icon id="selectoricon">star</md-icon></md-outlined-button>
+                    <md-outlined-button onclick="event.preventDefault(); iconSelect('addTask')"><md-icon id="addTask-selectoricon">star</md-icon></md-outlined-button>
                     <md-outlined-text-field
                         id="tasklabelfield"
                         type="text"
@@ -252,11 +270,52 @@
                     id="taskdescfield"
                     type="textarea"
                     class="field desc"
-                    label="Description">
+                    label="Description"
+                    style="margin-bottom: 10px">
                 </md-outlined-text-field>
+                <label style="display: flex; gap: 6px; align-items: center; font-size: 16px">
+                    <md-checkbox id="taskpriorityfield"></md-checkbox>
+                    Priority
+                </label>
             </form>
             <div slot="actions">
                 <md-filled-button form="addTaskForm">Create</md-filled-button>
+            </div>
+        </md-dialog>
+        <md-dialog id="editTask">
+            <div slot="headline">Edit task</div>
+            <form slot="content" id="editTaskForm" onsubmit="event.preventDefault(); finalizeTaskEdit(document.getElementById('etempid')); return false">
+                <span id="etempid"></span>
+                <md-outlined-text-field
+                    id="etasknamefield"
+                    class="field"
+                    label="Task Name"
+                    required
+                    error-text="Please add a task name">
+                </md-outlined-text-field>
+                <div class="group desc">
+                    <md-outlined-button onclick="event.preventDefault(); iconSelect('editTask')"><md-icon id="editTask-selectoricon">star</md-icon></md-outlined-button>
+                    <md-outlined-text-field
+                        id="etasklabelfield"
+                        type="text"
+                        class="field"
+                        label="Label">
+                    </md-outlined-text-field>
+                </div>
+                <md-outlined-text-field
+                    id="etaskdescfield"
+                    type="textarea"
+                    class="field desc"
+                    label="Description"
+                    style="margin-bottom: 10px">
+                </md-outlined-text-field>
+                <label style="display: flex; gap: 6px; align-items: center; font-size: 16px">
+                    <md-checkbox id="etaskpriorityfield"></md-checkbox>
+                    Priority
+                </label>
+            </form>
+            <div slot="actions">
+                <md-filled-button form="editTaskForm">Edit</md-filled-button>
             </div>
         </md-dialog>
         <md-dialog id="addList">
@@ -267,8 +326,14 @@
                     class="field"
                     label="List Name"
                     required
-                    error-text="Please add a list name">
+                    error-text="Please add a list name"
+                    style="margin-bottom:5px;">
                 </md-outlined-text-field>
+                <label>Share with friend...</label>
+                <md-outlined-select
+                    class="field"
+                    id="listuserfield">
+                </md-outlined-select>
             </form>
             <div slot="actions">
                 <md-filled-button form="addListForm">Create</md-filled-button>
@@ -276,7 +341,8 @@
         </md-dialog>
         <md-dialog id="iconSelect">
             <div slot="headline">Select an icon</div>
-            <form slot="content" id="iconSelectForm" class="undesc" onsubmit="event.preventDefault(); return false">
+            <span id="tempreturnmodal"></span>
+            <form slot="content" id="iconSelectForm" onsubmit="event.preventDefault(); return false">
                 <md-text-button class="iconselect" onclick="returnIcon();"><md-icon>star</md-icon></md-text-button>
                 <md-text-button class="iconselect" onclick="returnIcon();"><md-icon>bolt</md-icon></md-text-button>
                 <md-text-button class="iconselect" onclick="returnIcon();"><md-icon>block</md-icon></md-text-button>
@@ -304,7 +370,7 @@
         <md-dialog id="changePassword">
             <div slot="headline">Change password</div>
             <form slot="content" id="changePasswordForm" onsubmit="event.preventDefault(); changePassword(); return false">
-                <div slot="headline" class="undesc" id="cperror"></div>
+                <div slot="headline" id="cperror"></div>
                 <md-outlined-text-field
                     id="newpassword"
                     class="field desc"
@@ -344,7 +410,7 @@
         </md-dialog>
         <md-dialog id="accountInfo">
             <div slot="headline">
-                <img src="/assets/images/profile.svg" class="pfp" /> <span id="usernameacc"></span>
+                <img src="/assets/images/nprofile.svg" class="pfp" /> <span id="usernameacc"></span>
                 <md-icon-button onclick="location.reload()" class="reloadbtn"><md-icon>refresh</md-icon></md-icon-button>
             </div>
             <form slot="content" id="accountModal" onsubmit="event.preventDefault(); document.getElementById('accountInfo').close(); return false">
@@ -385,12 +451,13 @@
                         type="text"
                         class="field"
                         label="Add a friend by username..."
-                        required>
+                        required
+                        oninput="event.target.value = event.target.value.toLowerCase()"
+                        autocomplete="off">
                     </md-outlined-text-field>
                     <md-filled-button class="friendadd" id="friendaddbtn"><md-icon>add</md-icon></md-filled-button>
                 </form>
                 <span class="ferror" id="ferror"></span>
-                <span>This feature does...nothing. I promise that's not going to be the case forever. For now, add your friends!</span>
                 <div class="requests">
                     <span class="sectionhead">Pending Requests</span>
                     <span class="roaster" id="roast1"></span>
@@ -417,33 +484,84 @@
                     <md-icon>close</md-icon>
                 </md-icon-button>
             </div>
-            <form id="settingsContent" slot="content">
-                <label class="switch">
-                    <span class="switchlabel">Dark Mode</span>
-                    <md-switch id="setting0" onchange="setSetting(0, event.target.selected)"></md-switch>
-                </label>
-                <label class="switch">
-                    <span class="switchlabel">Allow Friend Requests</span>
-                    <md-switch id="setting1" selected onchange="setSetting(1, event.target.selected)"></md-switch>
-                </label>
-                <label class="switch">
-                    <span class="switchlabel">Enable Feedback</span>
-                    <md-switch id="setting2" selected onchange="setSetting(2, event.target.selected)"></md-switch>
-                </label>
-            </form>
+            <div id="settingsContent" slot="content">
+                <md-tabs id="settingsOptions">
+                    <md-primary-tab>
+                        <md-icon slot="icon">settings</md-icon>
+                        General
+                    </md-primary-tab>
+                    <md-primary-tab>
+                        <md-icon slot="icon">palette</md-icon>
+                        Appearance
+                    </md-primary-tab>
+                </md-tabs>
+                <div id="settingsGroup0" class="settingsGroup" style="display: initial">
+                    <label class="switch">
+                        <span class="switchlabel">Allow Friend Requests</span>
+                        <md-switch id="setting1" selected onchange="setSetting(1, event.target.selected)"></md-switch>
+                    </label>
+                    <label class="switch">
+                        <span class="switchlabel">Enable Feedback</span>
+                        <md-switch id="setting2" selected onchange="setSetting(2, event.target.selected)"></md-switch>
+                    </label>
+                </div>
+                <div id="settingsGroup1" class="settingsGroup">
+                    <label class="switch">
+                        <span class="switchlabel">Dark Mode</span>
+                        <md-switch id="setting0" onchange="setSetting(0, event.target.selected)"></md-switch>
+                    </label>
+                    <div id="colorHolder">
+                        <button class="colorIcon"
+                        onclick="switchColor('4,159,161')"
+                        style="background: rgb(4,159,161)"></button>
+                        <button class="colorIcon"
+                        onclick="switchColor('255,0,0')"
+                        style="background: rgb(255,0,0)"></button>
+                        <button class="colorIcon"
+                        onclick="switchColor('0,0,255')"
+                        style="background: rgb(0,0,255)"></button>
+                        <button class="colorIcon"
+                        onclick="switchColor('0,255,255')"
+                        style="background: rgb(0,255,255)"></button>
+                        <button class="colorIcon"
+                        onclick="switchColor('255,150,255')"
+                        style="background: rgb(255,150,255)"></button>
+                        <button class="colorIcon"
+                        onclick="switchColor('150,200,150')"
+                        style="background: rgb(150,200,150)"></button>
+                        <button class="colorIcon"
+                        onclick="switchColor('255,100,50')"
+                        style="background: rgb(255,100,50)"></button>
+                        <button class="colorIcon"
+                        onclick="switchColor('168,112,53')"
+                        style="background: rgb(168,112,53)"></button>
+                        <button class="colorIcon"
+                        onclick="switchColor('150,0,150')"
+                        style="background: rgb(150,0,150)"></button>
+                        <button class="colorIcon"
+                        onclick="switchColor('255,0,255')"
+                        style="background: rgb(255,0,255)"></button>
+                        <button class="colorIcon"
+                        onclick="switchColor('150,150,150')"
+                        style="background: rgb(150,150,150)"></button>
+                    </div>
+                    Even more beautiful colors are coming soon, stay tuned!
+                </div>
+            </div>
         </md-dialog>
         <md-dialog id="startCompetition">
-            <div slot="headline">Request Competition</div>
-            <form slot="content" id="startCompetitionForm" class="undesc" onsubmit="event.preventDefault(); sendCompetitionRequest(); return false">
+            <div slot="headline">Start Competition</div>
+            <form slot="content" id="startCompetitionForm" onsubmit="event.preventDefault(); startCompetition(); return false">
                 <label>Friend to Compete Against</label>
                 <div class="cfields" style="display: flex; gap: 10px; margin-bottom: 10px">
                     <md-outlined-select
                         id="ctaskAgainst"
-                        style="width: 50%;">
+                        style="width: 50%;"
+                        required>
                     </md-outlined-select>
                     <md-outlined-text-field
                         label="Competition Name"
-                        id="tasksAmount"
+                        id="compName"
                         style="width: 50%"
                         required>
                     </md-outlined-text-field>
@@ -451,20 +569,47 @@
                 <label>Amount of Tasks</label>
                 <md-slider
                     labeled
-                    min="0"
+                    min="3"
                     max="50"
                     value="25"
                     id="tasksAmount"
                     style="width: 100%">
                 </md-slider>
+                <span class="ferror" id="cferror"></span>
             </form>
             <div slot="actions">
-                <md-filled-button form="startCompetitionForm">Send</md-filled-button>
+                <md-filled-button form="startCompetitionForm">Start</md-filled-button>
+            </div>
+        </md-dialog>
+        <md-dialog id="competitionStats">
+            <div slot="headline" id="cName">Name</div>
+            <div slot="content">
+                <label id="cname1"></label>
+                <md-linear-progress id="sbar1" value="0.5" class="compstatbar"></md-linear-progress>
+                <label class="numstat" id="nstat1">5/10</label>
+                <label id="cname2"></label>
+                <md-linear-progress id="sbar2" value="0.75" class="compstatbar"></md-linear-progress>
+                <label class="numstat" id="nstat2">7.5/10</label>
+            </div>
+            <div slot="actions">
+                <md-text-button onclick="openAbandonCompetition()" id="abandonBtn">Abandon</md-text-button>
+                <md-filled-button onclick="document.getElementById('competitionStats').close();">Close</md-filled-button>
+            </div>
+        </md-dialog>
+        <md-dialog id="abandonCompetition">
+            <div slot="headline">Abandon Competition</div>
+            <form slot="content" id="abandonCompetitionForm" onsubmit="event.preventDefault(); abandonCompetition(); return false">
+                <div class="desc">You can still win this competition!</div>
+                <div style="color: red">Are you you want to quit?</div>
+            </form>
+            <div slot="actions">
+                <md-filled-button onclick="event.preventDefault(); document.getElementById('abandonCompetition').close();">Cancel</md-filled-button>
+                <md-text-button form="abandonCompetitionForm" class="delpasswordbtn" id="abandonBtn">Abandon</md-filled-button>
             </div>
         </md-dialog>
         <md-dialog id="sendFeedback">
             <div slot="headline">Send Feedback</div>
-            <form slot="content" id="sendFeedbackForm" class="undesc" onsubmit="event.preventDefault(); sendFeedback(); return false">
+            <form slot="content" id="sendFeedbackForm" onsubmit="event.preventDefault(); sendFeedback(); return false">
                 What type of feedback do you intend to submit?
                 <md-outlined-select required id="fType" onchange="feedbackEmail()">
                     <md-select-option value="suggestion">Suggestion</md-select-option>
@@ -514,10 +659,31 @@
                 <a class="notlink" href="/login.html"><md-filled-button>Log In</md-filled-button></a>
             </div>
         </md-dialog>
+
+        <md-dialog id="newVersion" onclose="localStorage.setItem('modalVersion', Version)">
+            <div slot="headline">It's getting started now...</div>
+            <div slot="content">
+                <img src="/assets/images/image0.png" width="100%" draggable="false" style="border-radius:20px;margin-top: 5px" />
+                <p>Hey everyone! We've got some exciting new features to share with you, along with some cool additions to the friends menu. Let's dive in!</p>
+                <p><b>List sharing:</b> This is one of our most requested features. Many of you suggested it through the feedback center. If you want to share a list, just go to the Social menu (in the top left) and click the three dots next to the friend you want to share it with. Then, click “Share List.” This will bring up the lists menu you know and love, but now lists you create are shared when you want them to be.</p>
+                <p><b>New Colors:</b> If you go to the settings in the same place you accessed the Social menu, you'll find some nice new categorization and a color picker in the appearance tab. That's right, you can now change Vyzon's accent color! This is just the beginning of many new ways to customize your lists that are coming soon.</p>
+                <p><b>Editing Tasks:</b> This was suggested to us by a user using the feedback button! It's been a long-awaited feature for Vyzon, and we're happy to include it. To edit a task, just tap on the task you want to edit.</p>
+                <p><b>Priority Tasks:</b> When creating or editing a task, you can now mark it as “Priority” to make it stay at the top of your list and be in bold. Now you'll never forget when you have something important coming up!</p>
+                <p><b>Competitions:</b> Vyzon's long-awaited flagship feature is finally here! Click the joystick above the task add button. You can give your competition a name, choose who you want to compete with, and set the number of tasks before the competition ends. We hope this motivates both you and the person you compete with.</p>
+                <p><b>Bug Fixes and Improvements:</b> We'll always fix as many issues as we can. In the new update, we've smashed a lot of bugs and changed tiny things to make Vyzon as good of an experience as possible.</p>
+                <p>If you find any of the bugs we missed or have some great ideas for new features or changes, just tap the feedback icon in the bottom left and type in everything you want us to know. We really appreciate it! Like, seriously, we do.</p>
+                <p>We're thrilled that we can release these features and make your life even better. But we would also love to see it! <b>DM us on Instagram (@vyzonapp) a video of you and a friend or family member using the competition feature or shared lists together!</b> <i></i>Maybe you'll even get featured in our next ad…</i></p>
+                <p>That's all for now! See you next month.</p>
+                <p>- The Vyzon Team</p>
+            </div>
+            <div slot="actions">
+                <md-filled-button onclick="document.getElementById('newVersion').close();">OK</md-filled-button>
+            </div>
+        </md-dialog>
     </body>
 
     <script>
-        Version = "24.08.1.0";
+        Version = "24.08.2.0";
         if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
             document.getElementById("lmodestyle").media = "max-width: 1px";
             document.getElementById("dmodestyle").media = "";

@@ -3,8 +3,18 @@ window.onload = function () {
         document.getElementById("loginNotice").show();
     } else {
         document.querySelector(".openinfo").style.display = "none";
+        if (localStorage.getItem('modalVersion') != Version) {
+            document.getElementById('newVersion').show();
+        }
     }
 }
+
+var statusReturn = apiRequest("competition/get", "GET", true, "", true);
+statusReturn.then(function (status) {
+    if (status["status"] == 200) {
+        setCompetitionStatus(status["data"]["name"], status["data"]["competitor"], status["data"]["user1"], status["data"]["user2"], status["data"]["finish"])
+    }
+})
 
 CurrentList = 0;
 
@@ -12,12 +22,13 @@ function getTasks(list) {
     document.querySelector(".loader").style.display = "initial";
     var tasksPromise = apiRequest("tasks/get?list=" + list, "GET", false);
     tasksPromise.then(function(tasks) {
+        TasksObject = tasks;
         document.querySelector(".loader").style.display = "none";
         document.getElementById("taskholder").innerHTML = "";
         if (tasks != undefined) {
             Object.keys(tasks).forEach(element => {
                 if (element != "name") {
-                    createTaskElem(tasks[element]["name"], tasks[element]["description"], tasks[element]["label"], tasks[element]["labelicon"], element);
+                    createTaskElem(tasks[element]["name"], tasks[element]["description"], tasks[element]["label"], tasks[element]["labelicon"], element, tasks[element]["priority"]);
                 }
             })
         } else {
@@ -31,13 +42,18 @@ function getSettings() {
     settingsPromise.then(function(settings) {
         Inter = 0;
         Object.keys(settings).forEach(element => {
-            if (settings[element] == 1) {
-                var newstate = true;
+            if (Inter != 3) {
+                if (settings[element] == 1) {
+                    var newstate = true;
+                } else {
+                    var newstate = false;
+                }
+                document.getElementById("setting" + element).selected = newstate;
+                setSettingClient(element, newstate);
             } else {
-                var newstate = false;
+                switchColor(settings[element], true);
             }
-            document.getElementById("setting" + element).selected = newstate;
-            setSettingClient(element, newstate)
+            Inter = Inter + 1;
         })
     })
 }
@@ -56,7 +72,11 @@ function getLists() {
     listsPromise.then(function(lists) {
         if (lists != undefined) {
             Object.keys(lists).forEach(element => {
-                createListElem(lists[element]["name"], element)
+                if (lists[element]["shared"] == undefined) {
+                    createListElem(lists[element]["name"], element, null)
+                } else {
+                    createListElem(lists[element]["name"], element, lists[element]["shared"])
+                }
             })
             Lists = lists;
             document.getElementById("dellist").disabled = false;
@@ -76,20 +96,28 @@ function addNewTask() {
     if (document.getElementById('tasklabelfield').value == "") {
         var labelicon = "";
     } else {
-        var labelicon = document.getElementById('selectoricon').textContent;
+        var labelicon = document.getElementById('addTask-selectoricon').textContent;
     }
-    apiRequest("tasks/add?list=" + CurrentList, "POST", true, JSON.stringify({
+    var addTaskPromise = apiRequest("tasks/add?list=" + CurrentList, "POST", true, JSON.stringify({
         "name": document.getElementById("tasknamefield").value,
-        "desc": document.getElementById("taskdescfield").value,
+        "description": document.getElementById("taskdescfield").value,
         "labelicon": labelicon,
-        "label": document.getElementById("tasklabelfield").value
+        "label": document.getElementById("tasklabelfield").value,
+        "priority": document.getElementById("taskpriorityfield").checked
     }))
-    createTaskElem(document.getElementById("tasknamefield").value, document.getElementById("taskdescfield").value, document.getElementById("tasklabelfield").value, labelicon);
-    event.target.parentElement.close();
-    document.getElementById("addTaskForm").reset();
+    addTaskPromise.then(function (ntid) {
+        createTaskElem(
+            document.getElementById("tasknamefield").value,
+            document.getElementById("taskdescfield").value,
+            document.getElementById("tasklabelfield").value,
+            labelicon, ntid,
+            document.getElementById("taskpriorityfield").checked);
+            document.getElementById("addTask").close();
+            document.getElementById("addTaskForm").reset();
+    })
 }
 
-function createTaskElem(name, description, labelt, labelicont, taskid) {
+function createTaskElem(name, description, labelt, labelicont, taskid, priority) {
     document.querySelector(".notasks").style.display = "none";
     var elem = document.createElement("div");
     var box = document.createElement("md-radio");
@@ -97,6 +125,7 @@ function createTaskElem(name, description, labelt, labelicont, taskid) {
     var desc = document.createElement("span");
     var labelicon = document.createElement("md-icon");
     var labeltext = document.createElement("span");
+    var label2 = document.createElement("span");
 
     elem.id = taskid;
 
@@ -108,24 +137,34 @@ function createTaskElem(name, description, labelt, labelicont, taskid) {
     elem.classList.add("task");
     label.classList.add("tlabel");
     desc.classList.add("descript");
-    labeltext.classList.add("label");
+    label2.classList.add("label");
+
+    if (priority) {
+        label.classList.add("priorityt");
+    }
 
     elem.appendChild(label);
     label.prepend(box);
     elem.appendChild(desc);
-    labeltext.prepend(labelicon);
-    elem.appendChild(labeltext);
+    if (description == undefined || description == "") {
+        desc.style.display = "none";
+    }
+    label2.appendChild(labelicon);
+    label2.appendChild(labeltext);
+    elem.appendChild(label2);
 
-    box.onclick = function () { completeTask(box.parentElement.parentElement.id); }
+    elem.onclick = function () { editTask(box.parentElement.parentElement.id, name, description, labelicont, labelt, priority); }
+    box.onclick = function () { BoxClicked = true; completeTask(box.parentElement.parentElement.id); }
 
-    document.getElementById("taskholder").appendChild(elem);
-
-    if (description == "") {
-        desc.remove();
+    if (priority) {
+        document.getElementById("taskholder").prepend(elem);
+    } else {
+        document.getElementById("taskholder").appendChild(elem);
     }
 }
+BoxClicked = false;
 
-function createListElem(listname, listid) {
+function createListElem(listname, listid, shared) {
     var listelem = document.getElementById("newlist");
     var parent = document.getElementById("listselect");
     var elem = document.createElement("md-select-option");
@@ -134,22 +173,80 @@ function createListElem(listname, listid) {
     head.slot = "headline";
     head.textContent = listname;
     elem.appendChild(head);
+    if (shared != null) {
+        var sub = document.createElement("div");
+        var subicon = document.createElement("md-icon");
+        subicon.textContent = "group";
+        var subtxt = document.createElement("span");
+        subtxt.textContent = shared;
+        sub.appendChild(subicon);
+        sub.appendChild(subtxt);
+        sub.classList.add("lsub");
+        elem.appendChild(sub);
+    }
     parent.insertBefore(elem, listelem);
 }
 
 function completeTask(id) {
     setTimeout(function () {
         document.getElementById(id).remove();
-        apiRequest("tasks/complete?list=" + CurrentList, "DELETE", false, id);
+        var taskRequest = apiRequest("tasks/complete?list=" + CurrentList, "DELETE", false, id);
         if (!document.querySelector(".task")) {
             document.querySelector(".notasks").style.display = "block";
         }
+        taskRequest.then(function (tparse) {
+            if (tparse["name"] != undefined) {
+                setCompetitionStatus(tparse["name"], tparse["competitor"], tparse["user1"], tparse["user2"], tparse["finish"])
+            }
+        })
     },200)
+}
+
+function editTask(id, name, desc, labeli, labelt, priority) {
+    if (BoxClicked) {
+        BoxClicked = false;
+    } else {
+        document.getElementById("etempid").textContent = id;
+        document.getElementById("etasknamefield").value = name;
+        if (desc != undefined) {
+            document.getElementById("etaskdescfield").value = desc;
+        }
+        document.getElementById("etasklabelfield").value = labelt;
+        if (labeli == "") {
+            document.getElementById("editTask-selectoricon").textContent = "star";
+        } else {
+            document.getElementById("editTask-selectoricon").textContent = labeli;
+        }
+        if (priority) {
+            document.getElementById("etaskpriorityfield").checked = true;
+        } else {
+            document.getElementById("etaskpriorityfield").checked = false;
+        }
+        document.getElementById("editTask").show();
+    }
+}
+function finalizeTaskEdit() {
+    if (document.getElementById("etasklabelfield").value == "") {
+        licon = "";
+    } else {
+        licon = document.getElementById("editTask-selectoricon").textContent;
+    }
+    apiRequest("tasks/add?list=" + CurrentList, "POST", true, JSON.stringify({
+        "id": document.getElementById("etempid").textContent,
+        "name": document.getElementById("etasknamefield").value,
+        "description": document.getElementById("etaskdescfield").value,
+        "labelicon": licon,
+        "label": document.getElementById("etasklabelfield").value,
+        "priority": document.getElementById("etaskpriorityfield").checked
+    }))
+    document.getElementById("editTask").close();
+    getTasks(CurrentList);
 }
 
 function listSwitch() {
     if (event.target.value == "new") {
         event.target.value = CurrentList.toString();
+        document.getElementById("addListForm").reset();
         document.getElementById("addList").show();
     } else if (event.target.value == "del") {
         Array.from(document.getElementById("dellistselectfield").children).forEach(function (element) {
@@ -177,7 +274,8 @@ function listSwitch() {
 
 function addNewList() {
     apiRequest("lists/create", "POST", true, JSON.stringify({
-        "name": document.getElementById("listnamefield").value
+        "name": document.getElementById("listnamefield").value,
+        "user": document.getElementById("listuserfield").value
     })).then(function () {
         getLists();
     })
@@ -198,15 +296,17 @@ function deleteList() {
 }
 document.getElementById("usernameacc").textContent = localStorage.getItem("username");
 
-function iconSelect() {
-    document.getElementById('addTask').close();
+function iconSelect(modal) {
+    document.getElementById(modal).close();
+    document.getElementById("tempreturnmodal").textContent = modal;
     document.getElementById('iconSelect').show();
 }
 document.getElementById('iconSelect').onclose = function () {
-    document.getElementById('addTask').show();
+    document.getElementById(document.getElementById("tempreturnmodal").textContent).show();
+    document.getElementById("tempreturnmodal").textContent = "";
 }
 function returnIcon() {
-    document.getElementById('selectoricon').textContent = event.target.textContent;
+    document.getElementById(document.getElementById("tempreturnmodal").textContent + '-selectoricon').textContent = event.target.textContent;
     document.getElementById('iconSelect').close();
 }
 
@@ -265,30 +365,64 @@ function generateFriendElem(type, name) {
         var username = document.createElement("span");
         var button = document.createElement("md-icon-button");
         var bi = document.createElement("md-icon");
+        var menuwrap = document.createElement("span");
+
+        button.id = "friendlisting-" + name;
+        base.id = "friendbase-" + name;
+
+        var menu = document.createElement("md-menu");
+        var menui1 = document.createElement("md-menu-item");
+        var menui2 = document.createElement("md-menu-item");
+        var menui3 = document.createElement("md-menu-item");
+        menui1.textContent = "Start Competition";
+        menui2.textContent = "Share List";
+        menui3.textContent = "Remove Friend";
+        menu.appendChild(menui1);
+        menu.appendChild(menui2);
+        menu.appendChild(menui3);
+        menui1.onclick = function () { readyCompetition(name) }
+        menui2.onclick = function () {
+            document.getElementById("friendList").close();
+            document.getElementById("listuserfield").value = name;
+            document.getElementById("addList").show();
+        }
+        menui3.onclick = function () { removeFriend(name) }
+
+        menuwrap.style.position = "relative";
+        menu.anchor = "friendlisting-" + name;
+        menu.id = "friendmenu-" + name;
+        menu.positioning = "popover";
 
         base.classList.add("friend");
         username.classList.add("rname");
-
-        button.onclick = function () { removeFriend() }
+        menuwrap.classList.add("menuwrap");
 
         username.textContent = name;
-        bi.textContent = "delete";
+        bi.textContent = "more_vert";
+
+        button.onclick = function () {
+            if (document.getElementById("friendmenu-" + name).open) {
+                document.getElementById("friendmenu-" + name).close();
+            } else {
+                document.getElementById("friendmenu-" + name).show();
+            }
+        }
 
         base.appendChild(username);
         button.appendChild(bi);
-        base.appendChild(button);
+        menuwrap.appendChild(button);
+        menuwrap.appendChild(menu);
+        base.appendChild(menuwrap);
         document.getElementById("friendRows").appendChild(base);
     }
 }
-function removeFriend() {
-    EvTarget = event.target;
-    console.log(EvTarget.parentElement.firstChild.textContent)
+function removeFriend(name) {
     var friendsPromise = apiRequest("friends/remove", "POST", false, JSON.stringify({
-        "name": EvTarget.parentElement.firstChild.textContent
+        "name": name
     }), true);
     friendsPromise.then(function(result) {
         if (result["status"] == 200) {
-            EvTarget.parentElement.remove();
+            document.getElementById("friendbase-" + name).remove();
         }
     })
     addRoasts()
@@ -341,7 +475,11 @@ function friendListOpen(flo) {
                     var mdso = document.createElement("md-select-option");
                     mdso.textContent = element;
                     mdso.value = element;
+                    var mdso2 = document.createElement("md-select-option");
+                    mdso2.textContent = element;
+                    mdso2.value = element;
                     document.getElementById("ctaskAgainst").appendChild(mdso);
+                    document.getElementById("listuserfield").appendChild(mdso2);
                 });
             }
         })
@@ -371,7 +509,6 @@ function addFriend() {
             document.getElementById("ferror").textContent = ""
         } else {
             document.getElementById("addfriendfield").value = "";
-            document.getElementById("ferror").textContent = "Error " + result["status"]
             switch (result["status"]) {
                 case 400: document.getElementById("ferror").textContent = "You can't add yourself."
                     break;
@@ -392,7 +529,6 @@ function addFriend() {
 }
 function acceptRequest() {
     EvTarget = event.target;
-    console.log(EvTarget.parentElement.firstChild.nextSibling.textContent)
     var friendsPromise = apiRequest("friends/accept", "POST", false, JSON.stringify({
         "name": EvTarget.parentElement.firstChild.nextSibling.textContent
     }), true);
@@ -408,7 +544,6 @@ function acceptRequest() {
 }
 function declineRequest() {
     EvTarget = event.target;
-    console.log(EvTarget.parentElement.firstChild.nextSibling.textContent)
     var friendsPromise = apiRequest("friends/decline", "POST", false, JSON.stringify({
         "name": EvTarget.parentElement.firstChild.nextSibling.textContent
     }), true);
@@ -423,7 +558,6 @@ function declineRequest() {
 }
 function cancelRequest() {
     EvTarget = event.target;
-    console.log(EvTarget.parentElement.firstChild.nextSibling.textContent)
     var friendsPromise = apiRequest("friends/cancel", "POST", false, JSON.stringify({
         "name": EvTarget.parentElement.firstChild.nextSibling.textContent
     }), true);
@@ -451,8 +585,10 @@ function addRoasts() {
 function setSetting(setting, state) {
     if (state == true) {
         nstate = 1;
-    } else {
+    } else if (state == false) {
         nstate = 0;
+    } else {
+        nstate = state;
     }
     apiRequest("settings/set", "POST", true, JSON.stringify({
         "setting": setting,
@@ -461,7 +597,6 @@ function setSetting(setting, state) {
     setSettingClient(setting, state);
 }
 function setSettingClient(setting, state) {
-    console.log(setting, state)
     if (setting == 0) {
         if (state == true) {
             document.getElementById("lmodestyle").media = "max-width: 1px";
@@ -479,26 +614,56 @@ function setSettingClient(setting, state) {
         }
     }
 }
-
+document.getElementById("settingsOptions").addEventListener('change', function () {
+    Array.from(document.getElementsByClassName("settingsGroup")).forEach(function (elem) {
+        elem.style.display = "none";
+    })
+    document.getElementById("settingsGroup" + event.target.activeTabIndex).style.display = "initial";   
+});
+function switchColor(rgb, noset) {
+    document.getElementById("accentstyle").textContent = `
+        :root {
+            --vyzon-accent: rgb(${rgb});
+            --vyzon-accent-75: rgb(${rgb},0.75);
+            --vyzon-accent-50: rgb(${rgb},0.50);
+            --vyzon-accent-25: rgb(${rgb},0.25);
+            --vyzon-accent-15: rgb(${rgb},0.15);
+            --vyzon-accent-05: rgb(${rgb},0.05);
+        }`
+    if (!noset) {
+        setSetting(3, rgb);
+    }
+}
+CompetitionOn = false;
 // Competition
 function setCompetitionStatus(name, user2, status1, status2, total) {
+    CompetitionOn = true;
     document.getElementById("cname").textContent = name;
     document.getElementById("user2name").textContent = user2;
 
-    var percent1 = (status1 / total);
-    var percent2 = (status2 / total);
+    var percent1 = (new Number(status1) / new Number(total));
+    var percent2 = (new Number(status2) / new Number(total));
 
     document.getElementById("bar1").value = percent1;
     document.getElementById("bar2").value = percent2;
+    document.getElementById("sbar1").value = percent1;
+    document.getElementById("sbar2").value = percent2;
+    document.getElementById("nstat1").textContent = `${status1}/${total} (${Math.round(percent1*100)}%)`;
+    document.getElementById("nstat2").textContent = `${status2}/${total} (${Math.round(percent2*100)}%)`;
+    document.getElementById("cName").textContent = name;
+    document.getElementById("cname1").textContent = localStorage.getItem("username");
+    document.getElementById("cname2").textContent = user2;
 
     document.getElementById("competition").style.display = "flex";
     setTimeout(function () {
         if (status1 == total) {
             document.getElementById("win").style.display = "flex";
             var winner = "You";
+            document.getElementById("abandonBtn").disabled = true;
         } else if (status2 == total) {
             document.getElementById("lose").style.display = "flex";
             var winner = user2;
+            document.getElementById("abandonBtn").disabled = true;
         }
         setTimeout(function () {
             if (status1 == total || status2 == total) {
@@ -512,9 +677,18 @@ function setCompetitionStatus(name, user2, status1, status2, total) {
     },1000)
 }
 
-function readyCompetition() {
-    friendListOpen(true);
-    document.getElementById("startCompetition").show();
+function readyCompetition(name) {
+    document.getElementById("friendList").close();
+    if (CompetitionOn) {
+        document.getElementById("competitionStats").show();
+    } else {
+        document.getElementById("startCompetitionForm").reset();
+        document.getElementById("startCompetition").show();
+        if (name) {
+            document.getElementById("ctaskAgainst").value = name;
+        }
+        document.getElementById("cferror").textContent = "";
+    }
 }
 function competitionFriendCallback(opens) {
     document.getElementById("ctaskAgainst").innerHTML = "";
@@ -530,8 +704,37 @@ function competitionFriendCallback(opens) {
         document.getElementById("startCompetition").show();
     }
 }
-function sendCompetitionRequest() {
-    
+function startCompetition() {
+    var statusReturn = apiRequest("competition/start", "POST", true, JSON.stringify({
+        "name": document.getElementById("compName").value,
+        "competitor": document.getElementById("ctaskAgainst").value,
+        "finish": document.getElementById("tasksAmount").value
+    }), true);
+    statusReturn.then(function (status) {
+        if (status["status"] == 409) {
+            document.getElementById("startCompetitionForm").reset();
+            document.getElementById("cferror").textContent = "This person is already in a competition.";
+        } else {
+            document.getElementById("startCompetition").close();
+            setCompetitionStatus(document.getElementById("compName").value, document.getElementById("ctaskAgainst").value, 0, 0, document.getElementById("tasksAmount").value)
+            document.getElementById("startCompetitionForm").reset();
+        }
+    })
+}
+function dismissCompetition() {
+    document.getElementById('competition').style.display = 'none';
+    apiRequest("competition/dismiss", "POST", true);
+    CompetitionOn = false;
+}
+function openAbandonCompetition() {
+    document.getElementById('competitionStats').close();
+    document.getElementById('abandonCompetition').show();
+}
+function abandonCompetition() {
+    document.getElementById('abandonCompetition').close();
+    apiRequest("competition/abandon", "POST", true);
+    document.getElementById('competition').style.display = 'none';
+    CompetitionOn = false;
 }
 
 // Feedback
