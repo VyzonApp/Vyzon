@@ -364,6 +364,9 @@ md-menu {
     display: none;
     animation: fadein 1s;
 }
+.stats {
+    cursor: pointer;
+}
 @keyframes fadein {
     from { opacity: 0% }
 }
@@ -471,6 +474,9 @@ md-menu {
     display: block;
     width: 100%;
     text-align: right;
+}
+#nVContent p {
+    margin: 0;
 }
 
 /* Mobile */

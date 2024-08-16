@@ -176,7 +176,8 @@
             <h1 class="menutitle">Vyzon<span class="beta" style="color: red; display: none">BETA</span></h1>
 
             <div class="competition" id="competition">
-                <div class="stats" id="cstats">
+                <div class="stats" id="cstats" onclick="readyCompetition()">                    <md-ripple></md-ripple>
+                    <md-ripple></md-ripple>
                     <span class="cname" id="cname"></span>
                     <div class="indicator">
                         <div class="names">
@@ -228,7 +229,7 @@
                             <div slot="headline"><i>Delete list...</i></div>
                         </md-select-option>
                     </md-filled-select>
-                    <button class="topbtn" onclick="getTasks(CurrentList);">
+                    <button class="topbtn" onclick="reload2()">
                         <md-icon>refresh</md-icon>
                         <md-ripple></md-ripple>
                     </button>
@@ -238,9 +239,6 @@
                 </div>
                 <md-fab id="feedbtn" class="feedbtn" onclick="document.getElementById('sendFeedback').show()">
                     <md-icon slot="icon">feedback</md-icon>
-                </md-fab>
-                <md-fab size="small" class="competebtn" onclick="readyCompetition()">
-                    <md-icon slot="icon">joystick</md-icon>
                 </md-fab>
                 <md-fab class="addbtn" onclick="document.getElementById('addTask').show()">
                     <md-icon slot="icon">add</md-icon>
@@ -315,7 +313,7 @@
                 </label>
             </form>
             <div slot="actions">
-                <md-filled-button form="editTaskForm">Edit</md-filled-button>
+                <md-filled-button form="editTaskForm">Save</md-filled-button>
             </div>
         </md-dialog>
         <md-dialog id="addList">
@@ -618,7 +616,7 @@
                     <md-select-option value="other">Other</md-select-option>
                 </md-outlined-select>
                 <md-outlined-text-field id="fEmail"
-                    placeholder="Email"
+                    placeholder="Email (Optional)"
                     class="desc"
                     type="email">
                 </md-outlined-text-field>
@@ -661,20 +659,19 @@
         </md-dialog>
 
         <md-dialog id="newVersion" onclose="localStorage.setItem('modalVersion', Version)">
-            <div slot="headline">It's getting started now...</div>
-            <div slot="content">
-                <img src="/assets/images/image0.png" width="100%" draggable="false" style="border-radius:20px;margin-top: 5px" />
-                <p>Hey everyone! We've got some exciting new features to share with you, along with some cool additions to the friends menu. Let's dive in!</p>
-                <p><b>List sharing:</b> This is one of our most requested features. Many of you suggested it through the feedback center. If you want to share a list, just go to the Social menu (in the top left) and click the three dots next to the friend you want to share it with. Then, click “Share List.” This will bring up the lists menu you know and love, but now lists you create are shared when you want them to be.</p>
-                <p><b>New Colors:</b> If you go to the settings in the same place you accessed the Social menu, you'll find some nice new categorization and a color picker in the appearance tab. That's right, you can now change Vyzon's accent color! This is just the beginning of many new ways to customize your lists that are coming soon.</p>
-                <p><b>Editing Tasks:</b> This was suggested to us by a user using the feedback button! It's been a long-awaited feature for Vyzon, and we're happy to include it. To edit a task, just tap on the task you want to edit.</p>
-                <p><b>Priority Tasks:</b> When creating or editing a task, you can now mark it as “Priority” to make it stay at the top of your list and be in bold. Now you'll never forget when you have something important coming up!</p>
-                <p><b>Competitions:</b> Vyzon's long-awaited flagship feature is finally here! Click the joystick above the task add button. You can give your competition a name, choose who you want to compete with, and set the number of tasks before the competition ends. We hope this motivates both you and the person you compete with.</p>
-                <p><b>Bug Fixes and Improvements:</b> We'll always fix as many issues as we can. In the new update, we've smashed a lot of bugs and changed tiny things to make Vyzon as good of an experience as possible.</p>
-                <p>If you find any of the bugs we missed or have some great ideas for new features or changes, just tap the feedback icon in the bottom left and type in everything you want us to know. We really appreciate it! Like, seriously, we do.</p>
-                <p>We're thrilled that we can release these features and make your life even better. But we would also love to see it! <b>DM us on Instagram (@vyzonapp) a video of you and a friend or family member using the competition feature or shared lists together!</b> <i></i>Maybe you'll even get featured in our next ad…</i></p>
-                <p>That's all for now! See you next month.</p>
-                <p>- The Vyzon Team</p>
+            <div slot="headline">Boring update.</div>
+            <div slot="content" id="nVContent">
+                <!--<img src="/assets/images/image0.png" width="100%" draggable="false" style="border-radius:20px;margin-top: 5px" />-->
+                <p>Just some bug fixes and user requested improvements. Carry on.</p><br>
+                <p>If you find any more bugs or have small things that might be a good idea to fix, let us know using the feedback button in the bottom left.</p><br>
+                <small>
+                <p>- The competition joystick no longer appears by the add task button. To access the menu either go to the friends menu or tap the competition details in the top right while a competition is running.</p>
+                <p>- The reload button now also updates competitions.</p>
+                <p>- The "Edit" button in editing tasks now says "Save".</p>
+                <p>- It is now clearer that email is not required in the feedback center.</p>
+                <p>- Fixed a bug where it was possible to continue a competition after it ended.</p>
+                <p>- Fixed a bug where deleting a list would only work on the server side.</p>
+                </small>
             </div>
             <div slot="actions">
                 <md-filled-button onclick="document.getElementById('newVersion').close();">OK</md-filled-button>
@@ -683,7 +680,7 @@
     </body>
 
     <script>
-        Version = "24.08.2.0";
+        Version = "24.08.2.1";
         if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
             document.getElementById("lmodestyle").media = "max-width: 1px";
             document.getElementById("dmodestyle").media = "";

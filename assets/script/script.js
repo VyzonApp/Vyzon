@@ -286,13 +286,15 @@ function addNewList() {
 function deleteList() {
     apiRequest("lists/delete", "POST", true, document.getElementById("dellistselectfield").value);
     event.target.parentElement.close();
-    getLists();
     if (CurrentList = document.getElementById("dellistselectfield").value) {
         CurrentList = 0;
         document.getElementById("listselect").value = "0";
         getTasks(CurrentList);
     }
     document.getElementById("delListForm").reset();
+    setTimeout(() => {
+        getLists();
+    }, 500);
 }
 document.getElementById("usernameacc").textContent = localStorage.getItem("username");
 
@@ -308,6 +310,15 @@ document.getElementById('iconSelect').onclose = function () {
 function returnIcon() {
     document.getElementById(document.getElementById("tempreturnmodal").textContent + '-selectoricon').textContent = event.target.textContent;
     document.getElementById('iconSelect').close();
+}
+function reload2() {
+    var statusReturn = apiRequest("competition/get", "GET", true, "", true);
+    statusReturn.then(function (status) {
+        if (status["status"] == 200) {
+            setCompetitionStatus(status["data"]["name"], status["data"]["competitor"], status["data"]["user1"], status["data"]["user2"], status["data"]["finish"])
+        }
+    })
+    getTasks(CurrentList);
 }
 
 // Social
@@ -636,7 +647,7 @@ function switchColor(rgb, noset) {
 }
 CompetitionOn = false;
 // Competition
-function setCompetitionStatus(name, user2, status1, status2, total) {
+function setCompetitionStatus(name, user2, status2, status1, total) {
     CompetitionOn = true;
     document.getElementById("cname").textContent = name;
     document.getElementById("user2name").textContent = user2;
@@ -666,7 +677,7 @@ function setCompetitionStatus(name, user2, status1, status2, total) {
             document.getElementById("abandonBtn").disabled = true;
         }
         setTimeout(function () {
-            if (status1 == total || status2 == total) {
+            if (status1 >= total || status2 >= total) {
                 document.getElementById("cstats").style.display = "none";
                 document.getElementById("win").style.display = "none";
                 document.getElementById("lose").style.display = "none";
