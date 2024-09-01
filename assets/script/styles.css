@@ -22,16 +22,23 @@ md-menu {
 .delpasswordbtn {
     --md-sys-color-primary: rgb(255,100,100);
 }
+.contentHolder {
+    width: 100%;
+    height: 100%;
+}
 .content {
     display: flex;
-    flex-direction: row;
-    justify-content: center;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
     position: fixed;
     bottom: 0;
     right: 0;
-    width: calc(100% - 40px);
     height: calc(100% - 100px);
-    padding: 20px;
+    width: calc(100% - 40px);
+}
+.content.cstarted {
+    height: calc(100% - 130px);
 }
 .topbtn {
     height: 56px;
@@ -46,7 +53,7 @@ md-menu {
     align-items: center;
     justify-content: center;
     border-left: 1px solid var(--vyzon-outline);
-    border-bottom: 1px solid var(--vyzon-outline-hard);
+    border-bottom: 1px solid var(--vyzon-text);
     cursor: pointer;
 }
 .taskswrapper {
@@ -85,23 +92,44 @@ md-menu {
 .task:last-child {
     margin-bottom: 100px;
 }
-.label {
+.date {
     display: flex;
-    align-items: center;
+    flex-direction: column;
+    justify-content: center;
+    align-items: end;
     position: absolute;
     right: 0;
     top: 0;
     font-size: 15px;
     font-family: 'Roboto';
     padding: 5px;
-    padding-right: 10px;
     color: var(--vyzon-text);
 }
-.label md-icon {
-    font-size: 18px;
+.datetext {
+    align-items: center;
+    display: flex;
+}
+.datetext:not(:empty)::before {
+    font-size: 15px;
     font-variation-settings:
         'FILL' 1;
     color: var(--vyzon-text);
+    font-family: "Material Symbols Rounded";
+    content: "calendar_month";
+    margin-right: 3px;
+}
+.daterelative {
+    font-size: 12px;
+    color: var(--vyzon-text-soft-alt);
+}
+.daterelative.repeatnotify:before {
+    font-size: 12px;
+    font-variation-settings:
+        'FILL' 1;
+    color: var(--vyzon-text-soft-alt);
+    font-family: "Material Symbols Rounded";
+    content: "repeat";
+    margin-right: 3px;
 }
 .task md-radio {
     margin-right: 15px;
@@ -128,12 +156,6 @@ md-menu {
     position: absolute;
     bottom: 10px;
     left: 10px;
-}
-.competebtn {
-    position: absolute;
-    bottom: 70px;
-    right: 10px;
-    --md-fab-small-container-shape: 10px;
 }
 .topmenu {
     display: flex;
@@ -164,19 +186,76 @@ md-menu {
     color: var(--vyzon-text);
     margin-right: auto;
     display: flex;
-    align-items: start;
+    align-items: center;
+    height: 50px;
+}
+.modeselect {
+    color: var(--vyzon-text-soft-alt);
+    margin-left: 0.25em;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+}
+.modeselect button {
+    background-color: transparent;
+    border: none;
+    color: var(--vyzon-text);
+    background: var(--vyzon-bg-alt);
+    padding: 0px;
+    width: 15px;
+    height: 15px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    outline: 1px solid var(--vyzon-outline);
+}
+.modeselect button md-icon {
+    font-size: 20px;
+}
+.modeselect button:hover {
+    background: var(--vyzon-bg);
+    transition: background 0.3s;
+}
+.probox {
+    background: 
+        radial-gradient(circle at 20% 30%, red, transparent 40%),
+        radial-gradient(circle at 80% 40%, orange, transparent 50%),
+        radial-gradient(circle at 50% 70%, yellow, transparent 50%),
+        radial-gradient(circle at 70% 90%, green, transparent 40%),
+        radial-gradient(circle at 30% 80%, blue, transparent 50%),
+        rgba(255, 0, 0, 0.75);
+    background-blend-mode: screen;
+    padding: 5px;
+    height: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 5px;
+    margin-left: 3px;
+    margin-bottom: 15px;
+    display: none;
+}
+.pro {
+    color: white;
+    font-weight: 900;
+    font-size: 13px;
+    text-shadow: 2px 2px 3px rgba(0,0,0,0.5);
+    width: 100%;
 }
 .beta {
     font-size: 15px;
     margin-left: 3px;
+    margin-bottom: 15px;
     background: -webkit-linear-gradient(75deg, #ff00dd, #5d00ff);
     background-clip: text;
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     font-weight: 900;
-}
-.field {
-    width: 100%;
+    display: none;
 }
 .group {
     display: flex;
@@ -309,13 +388,27 @@ md-menu {
 .competition {
     font-family: 'Roboto';
     outline: 1px solid var(--vyzon-outline);
-    border-radius: 10px;
-    padding: 0 5px;
-    padding-bottom: 2px;
+    padding: 2px 5px;
     color: var(--vyzon-text);
-    margin-right: 10px;
-    position: relative;
+    left: 25%;
+    right: 25%;
+    position: absolute;
     display: none;
+    align-items: center;
+    top: 60px;
+    width: calc(50% - 10px);
+    height: 30px;
+    border-bottom-left-radius: 10px;
+    border-bottom-right-radius: 10px;
+    margin-top: 1px;
+    cursor: pointer;
+}
+.cripple {
+    border-bottom-left-radius: 10px;
+    border-bottom-right-radius: 10px;
+}
+.cstarted + .competition {
+    display: flex;
 }
 .cname {
     font-size: 10px;
@@ -334,6 +427,9 @@ md-menu {
     display: flex;
     flex-direction: column;
     gap: 10px;
+    width: 40vw;
+    position: absolute;
+    right: 5px;
 }
 .progress md-linear-progress {
     --md-linear-progress-track-height: 7px;
@@ -341,6 +437,7 @@ md-menu {
     --md-linear-progress-track-shape: 8px;
     --md-linear-progress-active-indicator-color: rgb(234,213,24);
     --md-linear-progress-track-color: rgb(234,213,24,0.35);
+    width: 100%;
 }
 .progress md-linear-progress:first-child {
     margin-top: 3px;
@@ -372,14 +469,15 @@ md-menu {
 }
 .winreveal {
     display: none;
-    flex-direction: column;
-    gap: 2px;
-    padding: 2px 0px;
-    padding: 10px;
     cursor: pointer;
-    position: relative;
     border-radius: 10px;
-    transform: scale(1.1)
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    align-items: center;
+    justify-content: center;
 }
 .winname {
     font-size: 13px;
@@ -469,6 +567,7 @@ md-menu {
     --md-linear-progress-track-shape: 20px;
     --md-linear-progress-active-indicator-color: rgb(234,213,24);
     --md-linear-progress-track-color: rgb(234,213,24,0.35);
+    display: block;
 }
 .numstat {
     display: block;
@@ -477,6 +576,211 @@ md-menu {
 }
 #nVContent p {
     margin: 0;
+}
+.ntaskicon {
+    padding-top: 10px;
+    padding-bottom: 10px;
+    padding-left: 5px;
+    padding-right: 5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.ntaskicon md-icon {
+    font-size: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.ntaskicon.descicon md-icon {
+    margin-top: -30px;
+}
+#calendargrid {
+    display: flex;
+    flex-wrap: wrap;
+    width: 100%;
+    max-width: 1000px;
+    gap: 10px;
+    overflow-y: auto;
+    overflow-x: hidden;
+    height: fit-content;
+    padding: 10px;
+    justify-content: start;
+    margin-left: 20px;
+}
+.calendarbox {
+    flex-basis: calc((100% / 7) - 10px - calc(10px / 7));
+    aspect-ratio: 1 / 1;
+    height: fit-content;
+    font-size: 20px;
+    background: var(--vyzon-accent-25);
+    color: var(--vyzon-text);
+    font-family: 'Roboto';
+    font-weight: 400;
+    position: relative;
+    border-radius: 10px;
+    box-sizing: border-box;
+    column-gap: 10px;
+    animation: opacitymovein 1s;
+    cursor: pointer;
+}
+.calendarbox.cbtoday {
+    background: var(--vyzon-accent);
+    color: var(--vyzon-text-on-accent);
+    font-weight: 600;
+}
+.calendarbox.cbempty {
+    background: transparent;
+}
+.calendarbox .daynum {
+    position: absolute;
+    top: 7px;
+    left: 10px;
+}
+.monthname {
+    font-family: "Roboto";
+    color: var(--vyzon-text);
+    font-size: 30px;
+    width: 100%;
+    border-bottom: 1px solid var(--vyzon-outline);
+    margin-bottom: 10px;
+    padding-bottom: 10px;
+    display: flex;
+}
+#mnmonth {
+    font-weight: bold;
+}
+.forwardbackbuttons {
+    display: flex;
+    margin-left: auto;
+    gap: 5px;
+}
+.weeknames {
+    display: flex;
+    width: calc(100% + 10px);
+    max-width: 1010px;
+}
+.weekname {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    font-family: "Roboto";
+    font-size: 16px;
+    font-weight: 400;
+    color: var(--vyzon-text-soft-alt-2);
+    margin-bottom: 5px;
+    text-transform: uppercase;
+    transform: scaleY(0.85);
+    letter-spacing: .1em;
+}
+.weeknames.wlarge {
+    display: flex;
+}
+.weeknames.wsmall {
+    display: none;
+    font-size: 13px;
+}
+.minitasks {
+    margin-top: 30px;
+    padding: 3px;
+    display: flex;
+    gap: 2px;
+    flex-direction: column;
+    overflow: auto;
+    aspect-ratio: 1.5 / 1;
+    margin-bottom: -2px;
+}
+.minitask {
+    background: rgba(0,0,0,0.5);
+    color: var(--vyzon-text-on-accent);
+    font-family: "Roboto";
+    font-size: 12px;
+    padding: 2px;
+    font-weight: 400;
+    border-radius: 5px;
+}
+.calbadge {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    position: absolute;
+    right: -10px;
+    top: -10px;
+    background: rgb(255,100,100);
+    color: white;
+    font-family: "Roboto";
+    display: none;
+    justify-content: center;
+    align-items: center;
+    font-weight: 400;
+    font-size: 12px;
+}
+.noanim {
+    animation: none !important;
+}
+@keyframes opacitymovein {
+    from {
+        opacity: 0%;
+        transform: translateX(50%)
+    }
+}
+#chWhiteboard {
+    align-items: center;
+    justify-content: center;
+    display: flex;
+    height: calc(100% - 100px);
+}
+#whiteboardcontent {
+    display: flex;
+    flex-direction: row;
+    gap: 10px;
+    align-items: start;
+    justify-content: start;
+    flex-wrap: wrap;
+    width: 700px;
+    margin-right: -20px;
+    height: fit-content;
+    margin-top: 10px;
+    overflow-y: auto;
+}
+.whiteboardbox {
+    border: 3px solid var(--vyzon-accent);
+    padding: 10px;
+    border-radius: 20px;
+    width: 100%;
+    max-width: 700px;
+    flex-basis: calc(100% - 20px);
+    display: flex;
+    flex-direction: column;
+    box-sizing: border-box;
+}
+.whiteboardname {
+    font-size: 15px;
+    font-family: "Roboto";
+    color: var(--vyzon-text-soft-alt);
+}
+.whiteboardtask {
+    font-size: 20px;
+    font-family: "Roboto";
+    color: var(--vyzon-text-hard);
+    padding: 2px;
+    padding-left: 4px;
+    border-radius: 10px;
+    outline: 1px dashed transparent;
+    transition: outline 0.3s;
+    cursor: pointer;
+}
+.whiteboardtask:before {
+    content: "- ";
+    color: var(--vyzon-text-soft-alt);
+}
+.whiteboardtask:hover {
+    outline: 1px dashed var(--vyzon-outline);
+}
+.notaskswhiteboard {
+    font-size: 13px;
+    font-family: "Roboto";
+    color: var(--vyzon-text-soft-alt);
 }
 
 /* Mobile */
@@ -489,7 +793,15 @@ md-menu {
         height: calc(100% - 60px);
         padding: 0px;
     }
+    .content.cstarted {
+        height: calc(100% - 95px);
+    }
+    .topmenu {
+        box-shadow: inset 0 -1px 0 0 var(--vyzon-outline);
+    }
     .taskswrapper {
+        width: 100%;
+        height: 100%;
         max-width: 100%;
         max-height: 100%;
         outline: none;
@@ -534,6 +846,56 @@ md-menu {
     * {
         -webkit-user-select: none;
         user-select: none;
+    }
+    .progress {
+        width: 75vw;
+    }
+    .competition {
+        width: calc(100% - 10px);
+        border-bottom-left-radius: 0px;
+        border-bottom-right-radius: 0px;
+        margin-top: 0px;
+        left: 0;
+        right: 0;
+    }
+    .cripple {
+        border-bottom-left-radius: 0;
+        border-bottom-right-radius: 0;
+    }
+    .monthname {
+        padding: 8px;
+        width: calc(100% - 16px)
+    }
+    #chCalendar .content {
+        height: 100%;
+        top: 60px;
+        width: 100%;
+    }
+    #calendargrid {
+        overflow: hidden;
+    }
+    .calendarbox {
+        aspect-ratio: 1 / 1;
+        border-radius: 10px;
+    }
+    .calendarbox .daynum {
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        font-size: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    .weeknames.wlarge, .minitasks, .moreindicator {
+        display: none;
+    }
+    .weeknames.wsmall, .calbadge {
+        display: flex;
+    }
+    #whiteboardcontent {
+        width: 100%;
     }
 }
 @media (max-width: 700px) {

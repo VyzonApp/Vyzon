@@ -86,7 +86,7 @@
         </style>
         <style id="dmodestyle"> /* Dark Mode */
             :root {
-                --vyzon-full-bg: rgba(20,20,20);
+                --vyzon-full-bg: rgba(30,30,30);
                 --vyzon-bg: transparent;
                 --vyzon-bg-alt: rgba(50,50,50);
                 --vyzon-bg-alt2: rgb(25,25,25);
@@ -96,6 +96,7 @@
                 --vyzon-text-hard: white;
                 --vyzon-text-soft: rgb(75,75,75);
                 --vyzon-text-soft-alt: rgb(150,150,150);
+                --vyzon-text-soft-alt-2: rgb(200,200,200);
                 --vyzon-text-on-accent: rgb(255,255,255);
             }
             .taskswrapper::after {
@@ -104,7 +105,13 @@
                 border-radius: 5000px;
                 top: 175px;
                 left: 50%;
-                box-shadow: 0 0 500px 200px var(--vyzon-accent-25);
+            }
+            .contentHolder::after {
+                content: "";
+                position: absolute;
+                left: 50%;
+                right: 50%;
+                top: 25%;
             }
             .topmenu {
                 border-bottom: 1px solid transparent;
@@ -122,15 +129,14 @@
                 color: rgb(200, 130, 255);
             }
             @media (max-width: 700px) {
+                :root {
+                    --vyzon-full-bg: rgba(10,10,10);
+                }
                 .topmenu {
                     border-bottom: 1px solid transparent;
                 }
                 .topmenu::after {
                     background: transparent;
-                }
-                .taskswrapper::after {
-                    top: 200px;
-                    box-shadow: 0 0 250px 150px var(--vyzon-accent-50);
                 }
             }
         </style>
@@ -146,6 +152,7 @@
                 --vyzon-text-hard: black;
                 --vyzon-text-soft: rgb(75,75,75);
                 --vyzon-text-soft-alt: rgb(100,100,100);
+                --vyzon-text-soft-alt-2: rgb(150,150,150);
                 --vyzon-text-on-accent: rgb(255,255,255);
             }
             .feedbtn {
@@ -173,31 +180,31 @@
                     </md-menu-item>
                 </md-menu>
             </span>
-            <h1 class="menutitle">Vyzon<span class="beta" style="color: red; display: none">BETA</span></h1>
-
-            <div class="competition" id="competition">
-                <div class="stats" id="cstats" onclick="readyCompetition()">                    <md-ripple></md-ripple>
-                    <md-ripple></md-ripple>
-                    <span class="cname" id="cname"></span>
-                    <div class="indicator">
-                        <div class="names">
-                            <span>You</span>
-                            <span id="user2name"></span>
-                        </div>
-                        <div class="progress">
-                            <md-linear-progress id="bar1"></md-linear-progress>
-                            <md-linear-progress id="bar2"></md-linear-progress>
-                        </div>
-                    </div>
-                </div>
-                <div class="winreveal" id="creveal" onclick="dismissCompetition()">
-                    <span class="winname"><span id="winneruser">zakem</span> won!<br><span class="cdismiss">Click</span><span class="tdismiss">Tap</span> to dismiss.</span>
-                    <md-ripple></md-ripple>
-                </div>
-                <div class="cwl" id="win">You won!</div>
-                <div class="cwl" id="lose">You lost. :(</div>
-            </div>
-
+            <h1 class="menutitle">
+                Vyzon
+                <span class="probox">
+                    <span class="pro">PRO</span>
+                </span>
+                <span class="beta">TR</span>
+                <span class="modeselect" style="position: relative" id="modeswitchanchor">
+                    <span id="modeindicator">Tasks</span>
+                    <md-menu id="modesmenu" anchor="modeswitchanchor">
+                        <md-menu-item value="Tasks">
+                            <div slot="headline" onclick="switchModes(0)">Tasks</div>
+                        </md-menu-item>
+                        <md-menu-item value="Calendar" onclick="switchModes(1)">
+                            <div slot="headline">Calendar</div>
+                        </md-menu-item>
+                        <md-menu-item value="Whiteboard" onclick="switchModes(2)">
+                            <div slot="headline">Whiteboard</div>
+                        </md-menu-item>
+                    </md-menu>
+                    <button>
+                        <md-icon>arrow_drop_down</md-icon>
+                    </button>
+                </span>
+                
+            </h1>
             <span style="position: relative">
                 <md-icon-button id="acc-anchor" onclick="document.getElementById('accountInfo').show()">
                     <md-icon>account_circle</md-icon>
@@ -215,62 +222,144 @@
                 </md-menu>
             </span>
         </div>
-        <div class="content">
-            <div class="taskswrapper">
-                <div class="tasks">
-                    <md-filled-select class="listselect" onchange="listSwitch()" id="listselect">
-                        <md-select-option selected value="0">
-                            <div slot="headline">Main List</div>
-                        </md-select-option>
-                        <md-select-option value="new" id="newlist">
-                            <div slot="headline"><i>Add new list...</i></div>
-                        </md-select-option>
-                        <md-select-option value="del" id="dellist">
-                            <div slot="headline"><i>Delete list...</i></div>
-                        </md-select-option>
-                    </md-filled-select>
-                    <button class="topbtn" onclick="reload2()">
-                        <md-icon>refresh</md-icon>
-                        <md-ripple></md-ripple>
-                    </button>
-                    <span class="notasks">You don't have any tasks on this list.</span>
-                    <div id="taskholder"></div>
-                    <md-circular-progress indeterminate class="loader" style="margin-top: 10px"></md-circular-progress>
+        <div class="contentHolder" id="chTasks">
+            <div class="content" id="content">
+                <div class="taskswrapper">
+                    <div class="tasks">
+                        <md-filled-select class="listselect" onchange="listSwitch()" id="listselect">
+                            <md-select-option selected value="0">
+                                <div slot="headline">Main List</div>
+                            </md-select-option>
+                            <md-select-option value="new" id="newlist">
+                                <div slot="headline"><i>Add new list...</i></div>
+                            </md-select-option>
+                            <md-select-option value="del" id="dellist">
+                                <div slot="headline"><i>Delete list...</i></div>
+                            </md-select-option>
+                        </md-filled-select>
+                        <button class="topbtn" onclick="reload2()">
+                            <md-icon>refresh</md-icon>
+                            <md-ripple></md-ripple>
+                        </button>
+                        <span class="notasks">You don't have any tasks on this list.</span>
+                        <div id="taskholder"></div>
+                        <md-circular-progress indeterminate class="loader" style="margin-top: 10px"></md-circular-progress>
+                    </div>
+                    <md-fab id="feedbtn" class="feedbtn" onclick="document.getElementById('sendFeedback').show()">
+                        <md-icon slot="icon">feedback</md-icon>
+                    </md-fab>
+                    <md-fab class="addbtn" onclick="document.getElementById('addTask').show()">
+                        <md-icon slot="icon">add</md-icon>
+                    </md-fab>
                 </div>
-                <md-fab id="feedbtn" class="feedbtn" onclick="document.getElementById('sendFeedback').show()">
-                    <md-icon slot="icon">feedback</md-icon>
-                </md-fab>
-                <md-fab class="addbtn" onclick="document.getElementById('addTask').show()">
-                    <md-icon slot="icon">add</md-icon>
-                </md-fab>
+            </div>
+            <div class="competition" id="competition">
+                <md-ripple class="cripple"></md-ripple>
+                <div class="stats" id="cstats" onclick="readyCompetition()">
+                    <div class="indicator">
+                        <div class="names">
+                            <span>You</span>
+                            <span id="user2name"></span>
+                        </div>
+                        <div class="progress">
+                            <md-linear-progress id="bar1"></md-linear-progress>
+                            <md-linear-progress id="bar2"></md-linear-progress>
+                        </div>
+                    </div>
+                    <div class="cwl" id="win">You won!</div>
+                    <div class="cwl" id="lose">You lost. :(</div>
+                </div>
+                <div class="winreveal" id="creveal" onclick="dismissCompetition()">
+                    <span class="winname"><span id="winneruser"></span> won! <span class="cdismiss">Click</span><span class="tdismiss">Tap</span> to dismiss.</span>
+                    <md-ripple></md-ripple>
+                </div>
+            </div>
+        </div>
+        <div class="contentHolder" id="chCalendar">
+            <div class="content">
+                <div class="monthname">
+                    <span><span id="mnmonth"></span> <span id="mnyear"></span></span>
+                    <div class="forwardbackbuttons">
+                        <md-outlined-icon-button id="msbackwardbtn" onclick="switchMonth()">
+                            <md-icon>chevron_backward</md-icon>
+                        </md-outlined-icon-button>
+                        <md-outlined-icon-button id="msforwardbtn" onclick="switchMonth()">
+                            <md-icon>chevron_forward</md-icon>
+                        </md-outlined-icon-button>
+                    </div>
+                </div>
+                <div class="weeknames wlarge">
+                    <div class="weekname">Sunday</div>
+                    <div class="weekname">Monday</div>
+                    <div class="weekname">Tuesday</div>
+                    <div class="weekname">Wednesday</div>
+                    <div class="weekname">Thursday</div>
+                    <div class="weekname">Friday</div>
+                    <div class="weekname">Saturday</div>
+                </div>
+                <div class="weeknames wsmall">
+                    <div class="weekname">sun</div>
+                    <div class="weekname">mon</div>
+                    <div class="weekname">tue</div>
+                    <div class="weekname">wed</div>
+                    <div class="weekname">thu</div>
+                    <div class="weekname">fri</div>
+                    <div class="weekname">sat</div>
+                </div>
+                <div id="calendargrid"></div>
+            </div>
+        </div>
+        <div class="contentHolder" id="chWhiteboard">
+            <div class="content">
+                <span class="notaskswhiteboard" id="whiteboardlistsempty">You have no tasks.</span>
+                <div id="whiteboardcontent"></div>
             </div>
         </div>
         <md-dialog id="addTask">
             <div slot="headline">Create a task</div>
             <form slot="content" id="addTaskForm" onsubmit="event.preventDefault(); addNewTask(); return false">
-                <md-outlined-text-field
-                    id="tasknamefield"
-                    class="field"
-                    label="Task Name"
-                    required
-                    error-text="Please add a task name">
-                </md-outlined-text-field>
                 <div class="group desc">
-                    <md-outlined-button onclick="event.preventDefault(); iconSelect('addTask')"><md-icon id="addTask-selectoricon">star</md-icon></md-outlined-button>
+                    <span class="ntaskicon"><md-icon>article</md-icon></span>
                     <md-outlined-text-field
-                        id="tasklabelfield"
-                        type="text"
+                        id="tasknamefield"
                         class="field"
-                        label="Label">
+                        label="Name"
+                        required
+                        error-text="Please add a task name">
                     </md-outlined-text-field>
                 </div>
-                <md-outlined-text-field
-                    id="taskdescfield"
-                    type="textarea"
-                    class="field desc"
-                    label="Description"
-                    style="margin-bottom: 10px">
-                </md-outlined-text-field>
+                <div class="group desc">
+                    <span class="ntaskicon"><md-icon>calendar_month</md-icon></span>
+                    <md-outlined-text-field
+                        id="taskdatefield"
+                        type="date"
+                        class="field"
+                        label="Date">
+                    </md-outlined-text-field>
+                </div>
+                <div class="group">
+                    <span class="ntaskicon descicon"><md-icon>description</md-icon></span>
+                    <md-outlined-text-field
+                        id="taskdescfield"
+                        type="textarea"
+                        class="field desc"
+                        label="Description"
+                        style="margin-bottom: 10px">
+                    </md-outlined-text-field>
+                </div>
+                <div class="group">
+                    <span class="ntaskicon descicon"><md-icon>repeat</md-icon></span>
+                    <md-outlined-select
+                        id="taskrepeatfield"
+                        class="field"
+                        style="margin-bottom: 10px; width: 100%">
+                        <md-select-option selected value="0">Do Not Repeat</md-select-option>
+                        <md-select-option value="1">Repeat Daily</md-select-option>
+                        <md-select-option value="7">Repeat Weekly</md-select-option>
+                        <md-select-option value="30">Repeat Monthly</md-select-option>
+                        <md-select-option value="365">Repeat Yearly</md-select-option>
+                    </md-outlined-select>
+                </div>
                 <label style="display: flex; gap: 6px; align-items: center; font-size: 16px">
                     <md-checkbox id="taskpriorityfield"></md-checkbox>
                     Priority
@@ -284,35 +373,55 @@
             <div slot="headline">Edit task</div>
             <form slot="content" id="editTaskForm" onsubmit="event.preventDefault(); finalizeTaskEdit(document.getElementById('etempid')); return false">
                 <span id="etempid"></span>
-                <md-outlined-text-field
-                    id="etasknamefield"
-                    class="field"
-                    label="Task Name"
-                    required
-                    error-text="Please add a task name">
-                </md-outlined-text-field>
                 <div class="group desc">
-                    <md-outlined-button onclick="event.preventDefault(); iconSelect('editTask')"><md-icon id="editTask-selectoricon">star</md-icon></md-outlined-button>
+                    <span class="ntaskicon"><md-icon>article</md-icon></span>
                     <md-outlined-text-field
-                        id="etasklabelfield"
-                        type="text"
+                        id="etasknamefield"
                         class="field"
-                        label="Label">
+                        label="Name"
+                        required
+                        error-text="Please add a task name">
                     </md-outlined-text-field>
                 </div>
-                <md-outlined-text-field
-                    id="etaskdescfield"
-                    type="textarea"
-                    class="field desc"
-                    label="Description"
-                    style="margin-bottom: 10px">
-                </md-outlined-text-field>
+                <div class="group desc">
+                    <span class="ntaskicon"><md-icon>calendar_month</md-icon></span>
+                    <md-outlined-text-field
+                        id="etaskdatefield"
+                        type="date"
+                        class="field"
+                        label="Date">
+                    </md-outlined-text-field>
+                </div>
+                <div class="group">
+                    <span class="ntaskicon descicon"><md-icon>description</md-icon></span>
+                    <md-outlined-text-field
+                        id="etaskdescfield"
+                        type="textarea"
+                        class="field desc"
+                        label="Description"
+                        style="margin-bottom: 10px">
+                    </md-outlined-text-field>
+                </div>
+                <div class="group">
+                    <span class="ntaskicon descicon"><md-icon>repeat</md-icon></span>
+                    <md-outlined-select
+                        id="etaskrepeatfield"
+                        class="field"
+                        style="margin-bottom: 10px; width: 100%">
+                        <md-select-option selected value="0">Do Not Repeat</md-select-option>
+                        <md-select-option value="1">Repeat Daily</md-select-option>
+                        <md-select-option value="7">Repeat Weekly</md-select-option>
+                        <md-select-option value="30">Repeat Monthly</md-select-option>
+                        <md-select-option value="365">Repeat Yearly</md-select-option>
+                    </md-outlined-select>
+                </div>
                 <label style="display: flex; gap: 6px; align-items: center; font-size: 16px">
                     <md-checkbox id="etaskpriorityfield"></md-checkbox>
                     Priority
                 </label>
             </form>
             <div slot="actions">
+                <md-text-button class="delpasswordbtn" onclick="document.getElementById('editTask').close(); deleteTask(document.getElementById('etempid').textContent)">Delete</md-text-button>
                 <md-filled-button form="editTaskForm">Save</md-filled-button>
             </div>
         </md-dialog>
@@ -330,7 +439,8 @@
                 <label>Share with friend...</label>
                 <md-outlined-select
                     class="field"
-                    id="listuserfield">
+                    id="listuserfield"
+                    style="width: 100%;">
                 </md-outlined-select>
             </form>
             <div slot="actions">
@@ -554,15 +664,9 @@
                 <div class="cfields" style="display: flex; gap: 10px; margin-bottom: 10px">
                     <md-outlined-select
                         id="ctaskAgainst"
-                        style="width: 50%;"
+                        style="width: 100%;"
                         required>
                     </md-outlined-select>
-                    <md-outlined-text-field
-                        label="Competition Name"
-                        id="compName"
-                        style="width: 50%"
-                        required>
-                    </md-outlined-text-field>
                 </div>
                 <label>Amount of Tasks</label>
                 <md-slider
@@ -580,7 +684,7 @@
             </div>
         </md-dialog>
         <md-dialog id="competitionStats">
-            <div slot="headline" id="cName">Name</div>
+            <div slot="headline">Competition Stats</div>
             <div slot="content">
                 <label id="cname1"></label>
                 <md-linear-progress id="sbar1" value="0.5" class="compstatbar"></md-linear-progress>
@@ -606,7 +710,7 @@
             </div>
         </md-dialog>
         <md-dialog id="sendFeedback">
-            <div slot="headline">Send Feedback</div>
+            <div slot="headline">Feedback Center</div>
             <form slot="content" id="sendFeedbackForm" onsubmit="event.preventDefault(); sendFeedback(); return false">
                 What type of feedback do you intend to submit?
                 <md-outlined-select required id="fType" onchange="feedbackEmail()">
@@ -637,6 +741,18 @@
                 <md-filled-button form="sendFeedbackForm">Send</md-filled-button>
             </div>
         </md-dialog>
+        <md-dialog id="calendartasks">
+            <div slot="headline">
+                <span style="flex: 1;" id="calendarmodaldate"></span>
+                <md-icon-button onclick="event.preventDefault();event.target.parentElement.parentElement.close()">
+                    <md-icon>close</md-icon>
+                </md-icon-button>
+            </div>
+            <div slot="content">
+                <span id="nodatetasks">There are no tasks for this date.</span>
+                <div id="calendartasksholder"></div>
+            </div>
+        </md-dialog>
         <md-dialog id="sendFeedbackConfirm">
             <div slot="headline">Thank you for your feedback!</div>
             <div slot="content">
@@ -658,20 +774,23 @@
             </div>
         </md-dialog>
 
-        <md-dialog id="newVersion" onclose="localStorage.setItem('modalVersion', Version)">
-            <div slot="headline">Boring update.</div>
+        <md-dialog id="newVersion" onclose="localStorage.setItem('modalVersion', Version.slice(0, 7))">
+            <div slot="headline">Let's get organized!</div>
             <div slot="content" id="nVContent">
-                <!--<img src="/assets/images/image0.png" width="100%" draggable="false" style="border-radius:20px;margin-top: 5px" />-->
-                <p>Just some bug fixes and user requested improvements. Carry on.</p><br>
-                <p>If you find any more bugs or have small things that might be a good idea to fix, let us know using the feedback button in the bottom left.</p><br>
-                <small>
-                <p>- The competition joystick no longer appears by the add task button. To access the menu either go to the friends menu or tap the competition details in the top right while a competition is running.</p>
-                <p>- The reload button now also updates competitions.</p>
-                <p>- The "Edit" button in editing tasks now says "Save".</p>
-                <p>- It is now clearer that email is not required in the feedback center.</p>
-                <p>- Fixed a bug where it was possible to continue a competition after it ended.</p>
-                <p>- Fixed a bug where deleting a list would only work on the server side.</p>
-                </small>
+                <img src="/assets/images/image1.png" width="100%" draggable="false" style="border-radius:20px;margin-top: 5px" />
+                <p>School's coming up, and we're here to help with that, so here's what's new.</p>
+                <br>
+                <p><b>Dates:</b> Looks like labels aren't the most popular, so we're introducing a much more useful feature to take its place - dates! You can easily set a due date for an task and Vyzon will let you know how long until it expires.</p>
+                <p><b>Calendar:</b> Introducing Vyzon Calendar! To compliment dates, you can tap on the header at the top of the app to switch to Calendar mode. Calendar mode is a new interface that will show you all the tasks with dates in one place. You can switch between months and tap on days to see the task descriptions too!</p>
+                <p><b>Whiteboard Mode:</b> If all that wasn't enough, you can also get all your lists in one spread out view with Whiteboard Mode! Cast it with a projector or TV and it is perfect for showing everyone what they need to do at a glance.</p>
+                <p><b>Repeating Tasks:</b> Sometimes tasks happen more than once. Instead of recreating them every single day, you can now set a task to repeat every day, week, month, or year!</p>
+                <p><b>Deleting Tasks:</b> You can also delete a task from the edit menu without completing it, so it doesn't count towards competition.</p>
+                <br>
+                <p>Whether you're in school or not, we're sure this update will be great at keeping you on time and ready for whatever comes next. Enjoy!</p>
+                <br>
+                <p>- The Vyzon Team</p>
+                <br>
+                <p><small>Psst - if you encounter any bugs or have any suggestions for the next update, feel free to use the feedback button in the bottom left of your task list. It really helps!</small></p>
             </div>
             <div slot="actions">
                 <md-filled-button onclick="document.getElementById('newVersion').close();">OK</md-filled-button>
@@ -680,13 +799,17 @@
     </body>
 
     <script>
-        Version = "24.08.2.1";
+        Version = "24.09.1.0";
         if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
             document.getElementById("lmodestyle").media = "max-width: 1px";
             document.getElementById("dmodestyle").media = "";
             document.querySelector(".openinfo").style.background = "black";
         }
-
+        if (Version.includes("T")) {
+            document.querySelector(".beta").style.display = "flex";
+        } else {
+            document.querySelector(".beta").style.display = "none";
+        }
         var scpt = document.createElement("script");
         scpt.src = "/assets/script/script.js?v=" + Version;
         document.body.appendChild(scpt);

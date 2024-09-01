@@ -3,32 +3,87 @@ window.onload = function () {
         document.getElementById("loginNotice").show();
     } else {
         document.querySelector(".openinfo").style.display = "none";
-        if (localStorage.getItem('modalVersion') != Version) {
+        if (localStorage.getItem('modalVersion') != Version.slice(0, 7)) {
             document.getElementById('newVersion').show();
         }
     }
 }
-
+if (navigator.userAgent.indexOf('AppleWebKit') != -1) {
+    DateOffset = 0
+} else {
+    DateOffset = 0
+}
 var statusReturn = apiRequest("competition/get", "GET", true, "", true);
 statusReturn.then(function (status) {
     if (status["status"] == 200) {
-        setCompetitionStatus(status["data"]["name"], status["data"]["competitor"], status["data"]["user1"], status["data"]["user2"], status["data"]["finish"])
+        setCompetitionStatus(status["data"]["competitor"], status["data"]["user1"], status["data"]["user2"], status["data"]["finish"])
     }
 })
 
+function getFirstDayOfMonth(year, month) {
+    return new Date(year, month - 1, 1).getDay();
+}
+function getDaysInMonth(year, month) {
+    return new Date(year, month, 0).getDate() 
+}
+function numberToArray(n) {
+    return Array.from({ length: n }, (_, i) => i + 1);
+}
+
+Modes = ["Tasks", "Calendar", "Whiteboard"]
+switchModes(0)
+function switchModes(modenum) {
+    for (let index = 0; index < Modes.length; index++) {
+        document.getElementById("ch" + Modes[index]).style.display = "none";
+    }
+    document.getElementById("ch" + Modes[modenum]).style.display = "flex";
+    document.getElementById("modeindicator").textContent = Modes[modenum];
+    if (modenum == 0) {
+        getTasks(0);
+    } else if (modenum == 1) {
+        var tasksPromise = apiRequest("tasks/get?list=all", "GET", false);
+        tasksPromise.then(function(tasks) {
+            AllTasks = tasks;
+            startCalendar(new Date().getFullYear(), new Date().getMonth() + 1);
+        });
+    } else if (modenum == 2) {
+        var tasksPromise = apiRequest("tasks/get?list=all", "GET", false);
+        tasksPromise.then(function(tasks) {
+            AllTasks = tasks;
+            startWhiteboard();
+        });
+    }
+    CurrentMode = modenum;
+}
+
 CurrentList = 0;
 
+TasksObject = {}
 function getTasks(list) {
     document.querySelector(".loader").style.display = "initial";
     var tasksPromise = apiRequest("tasks/get?list=" + list, "GET", false);
     tasksPromise.then(function(tasks) {
-        TasksObject = tasks;
         document.querySelector(".loader").style.display = "none";
         document.getElementById("taskholder").innerHTML = "";
         if (tasks != undefined) {
             Object.keys(tasks).forEach(element => {
                 if (element != "name") {
-                    createTaskElem(tasks[element]["name"], tasks[element]["description"], tasks[element]["label"], tasks[element]["labelicon"], element, tasks[element]["priority"]);
+                    createTaskElem(
+                        tasks[element]["name"],
+                        tasks[element]["description"],
+                        tasks[element]["date"],
+                        element,
+                        tasks[element]["priority"],
+                        tasks[element]["repeat"],
+                        document.getElementById("taskholder"));
+                }
+                TasksObject[element] = {
+                    "name": tasks[element]["name"],
+                    "description": tasks[element]["description"],
+                    "date": tasks[element]["date"],
+                    "priority": tasks[element]["priority"],
+                    "repeat": tasks[element]["repeat"],
+                    "list": list
                 }
             })
         } else {
@@ -87,60 +142,96 @@ function getLists() {
 }
 
 window.addEventListener("load", function () {
-    getTasks(0);
     getLists();
     getSettings();
 });
 
 function addNewTask() {
-    if (document.getElementById('tasklabelfield').value == "") {
-        var labelicon = "";
-    } else {
-        var labelicon = document.getElementById('addTask-selectoricon').textContent;
-    }
     var addTaskPromise = apiRequest("tasks/add?list=" + CurrentList, "POST", true, JSON.stringify({
         "name": document.getElementById("tasknamefield").value,
         "description": document.getElementById("taskdescfield").value,
-        "labelicon": labelicon,
-        "label": document.getElementById("tasklabelfield").value,
-        "priority": document.getElementById("taskpriorityfield").checked
+        "date": document.getElementById("taskdatefield").value,
+        "priority": document.getElementById("taskpriorityfield").checked,
+        "repeat": document.getElementById("taskrepeatfield").value
     }))
     addTaskPromise.then(function (ntid) {
         createTaskElem(
             document.getElementById("tasknamefield").value,
             document.getElementById("taskdescfield").value,
-            document.getElementById("tasklabelfield").value,
-            labelicon, ntid,
-            document.getElementById("taskpriorityfield").checked);
+            document.getElementById("taskdatefield").value,
+            ntid,
+            document.getElementById("taskpriorityfield").checked,
+            document.getElementById("taskrepeatfield").value,
+            document.getElementById("taskholder"));
+            TasksObject[ntid] = {
+                "name": document.getElementById("tasknamefield").value,
+                "description": document.getElementById("taskdescfield").value,
+                "date": document.getElementById("taskdatefield").value,
+                "priority": document.getElementById("taskpriorityfield").checked,
+                "repeat": document.getElementById("taskrepeatfield").value,
+                "list": CurrentList
+            }
             document.getElementById("addTask").close();
             document.getElementById("addTaskForm").reset();
     })
 }
 
-function createTaskElem(name, description, labelt, labelicont, taskid, priority) {
+function createTaskElem(name, description, datet, taskid, priority, repeat, container) {
     document.querySelector(".notasks").style.display = "none";
     var elem = document.createElement("div");
     var box = document.createElement("md-radio");
     var label = document.createElement("span");
     var desc = document.createElement("span");
-    var labelicon = document.createElement("md-icon");
-    var labeltext = document.createElement("span");
-    var label2 = document.createElement("span");
+    var datetext = document.createElement("span");
+    var date2 = document.createElement("span");
+    var date3 = document.createElement("span");
 
     elem.id = taskid;
 
     label.textContent = name;
     desc.textContent = description;
-    labeltext.textContent = labelt; 
-    labelicon.textContent = labelicont;
+    if (new Date(datet) != "Invalid Date") {
+        date2.style.display = "flex";
+        datetasdate = new Date(datet);
+        datetasdate.setDate(datetasdate.getDate() + 1);
+        datetext.textContent = new Date(datetasdate).toLocaleDateString();
+        date3.textContent = timeDifference(datetasdate);
+    } else {
+        date2.style.display = "none";
+    }
+    if (repeat != 0) {
+        switch (repeat) {
+            case undefined:
+                break;
+            case "1":
+                date3.textContent = "Repeats daily"
+                break;
+            case "7":
+                date3.textContent = "Repeats weekly"
+                break;
+            case "30":
+                date3.textContent = "Repeats monthly"
+                break;
+            case "365":
+                date3.textContent = "Repeats yearly"
+                break;
+            default:
+                date3.textContent = "Repeats every " + repeat + " days"
+                break;
+        }
+        date3.classList.add("repeatnotify");
+        date2.style.display = "flex";
+    }
 
     elem.classList.add("task");
     label.classList.add("tlabel");
     desc.classList.add("descript");
-    label2.classList.add("label");
+    date2.classList.add("date");
+    date3.classList.add("daterelative");
+    datetext.classList.add("datetext")
 
     if (priority) {
-        label.classList.add("priorityt");
+        date.classList.add("priorityt");
     }
 
     elem.appendChild(label);
@@ -149,20 +240,96 @@ function createTaskElem(name, description, labelt, labelicont, taskid, priority)
     if (description == undefined || description == "") {
         desc.style.display = "none";
     }
-    label2.appendChild(labelicon);
-    label2.appendChild(labeltext);
-    elem.appendChild(label2);
+    date2.appendChild(datetext);
+    date2.appendChild(date3);
+    elem.appendChild(date2);
 
-    elem.onclick = function () { editTask(box.parentElement.parentElement.id, name, description, labelicont, labelt, priority); }
-    box.onclick = function () { BoxClicked = true; completeTask(box.parentElement.parentElement.id); }
+    elem.onclick = function () { editTask(taskid, name, description, datet, priority, repeat); }
+    box.onclick = function () { BoxClicked = true; completeTask(event.target.parentElement.parentElement.id); }
 
     if (priority) {
-        document.getElementById("taskholder").prepend(elem);
+        container.prepend(elem);
     } else {
-        document.getElementById("taskholder").appendChild(elem);
+        container.appendChild(elem);
     }
 }
 BoxClicked = false;
+
+function timeAgo(date) {
+    const now = new Date();
+    const seconds = Math.floor((now - date) / 1000);
+    if (seconds < 10) {
+        return "now";
+    } else if (seconds < 60) {
+        return `${seconds} seconds ago`;
+    }
+    const minutes = Math.floor(seconds / 60);
+    if (minutes < 60) {
+        return `${minutes} minutes ago`;
+    }
+    const hours = Math.floor(minutes / 60);
+    if (hours < 24) {
+        return `${hours} hours ago`;
+    }
+    const days = Math.floor(hours / 24);
+    if (days < 7) {
+        return `${days} days ago`;
+    }
+    const weeks = Math.floor(days / 7);
+    if (weeks < 4) {
+        return `${weeks} weeks ago`;
+    }
+    const months = Math.floor(days / 30);
+    if (months < 12) {
+        return `${months} months ago`;
+    }
+    const years = Math.floor(days / 365);
+    return `${years} years ago`;
+}
+function timeUntil(date) {
+    const now = new Date();
+    const seconds = Math.floor((date - now) / 1000);
+    if (seconds < 10) {
+        return "in a few seconds";
+    } else if (seconds < 60) {
+        return `in ${seconds} seconds`;
+    }
+    const minutes = Math.floor(seconds / 60);
+    if (minutes < 60) {
+        return `in ${minutes} minutes`;
+    }
+    const hours = Math.floor(minutes / 60);
+    if (hours < 24) {
+        return `in ${hours} hours`;
+    }
+    const days = Math.floor(hours / 24);
+    if (days < 7) {
+        return `in ${days} days`;
+    }
+    const weeks = Math.floor(days / 7);
+    if (weeks < 4) {
+        return `in ${weeks} weeks`;
+    }
+    const months = Math.floor(days / 30);
+    if (months < 12) {
+        return `in ${months} months`;
+    }
+    const years = Math.floor(days / 365);
+    return `in ${years} years`;
+}
+function timeDifference(date) {
+    const now = new Date();
+    if (date < now) {
+        return timeAgo(date);
+    } else {
+        return timeUntil(date);
+    }
+}
+function getMonthName(monthNumber) {
+    const date = new Date();
+    date.setMonth(monthNumber - 1);
+    return date.toLocaleString('default', { month: 'long' });
+}
 
 function createListElem(listname, listid, shared) {
     var listelem = document.getElementById("newlist");
@@ -186,61 +353,95 @@ function createListElem(listname, listid, shared) {
     }
     parent.insertBefore(elem, listelem);
 }
-
+function convertToDate(dateString) {
+    const [year, month, day] = dateString.split('-');
+    return new Date(year, month - 1, day);
+}
 function completeTask(id) {
-    setTimeout(function () {
-        document.getElementById(id).remove();
-        var taskRequest = apiRequest("tasks/complete?list=" + CurrentList, "DELETE", false, id);
+    var taskRequest = apiRequest("tasks/complete?list=" + TasksObject[id]["list"], "DELETE", false, id);
+    if (TasksObject[id]["repeat"] == 0 || TasksObject[id]["repeat"] == undefined) {
+        document.querySelectorAll("#" + id).forEach(function (element) {
+            element.remove();
+        })
         if (!document.querySelector(".task")) {
             document.querySelector(".notasks").style.display = "block";
         }
-        taskRequest.then(function (tparse) {
-            if (tparse["name"] != undefined) {
-                setCompetitionStatus(tparse["name"], tparse["competitor"], tparse["user1"], tparse["user2"], tparse["finish"])
+    } else {
+        document.querySelectorAll("#" + id).forEach(function (element) {
+            element.firstChild.firstChild.remove();
+            var newradio = document.createElement("md-radio");
+            element.firstChild.prepend(newradio);
+            newradio.onclick = function () { BoxClicked = true; completeTask(event.target.parentElement.parentElement.id); }
+        });
+
+        document.querySelectorAll("#" + id).forEach(function (element) {
+            var elem = element.firstChild.nextSibling.nextSibling;
+            if (TasksObject[id]["date"] != '') {
+                var tempdate = new Date(elem.firstChild.textContent);
+            } else {
+                var tempdate = new Date();
             }
+            tempdate.setDate(tempdate.getDate() + new Number(TasksObject[id]["repeat"]));
+            elem.firstChild.textContent = tempdate.toLocaleDateString();
         })
-    },200)
+    }
+    taskRequest.then(function (tparse) {
+        if (tparse["competitor"] != undefined) {
+            setCompetitionStatus(tparse["competitor"], tparse["user1"], tparse["user2"], tparse["finish"])
+        }
+    })
+    if (document.getElementById("calendartasksholder").innerHTML == "") {
+        document.getElementById("nodatetasks").style.display = "block";
+    } else {
+        document.getElementById("nodatetasks").style.display = "none";
+    }
+    if (CurrentMode == 1) {
+        if (TasksObject[id]["repeat"] == 0 || TasksObject[id]["repeat"] == undefined) {
+            startCalendar(CalYear, CalMonth, true);
+        } else {
+            var tasksPromise = apiRequest("tasks/get?list=all", "GET", false);
+            tasksPromise.then(function(tasks) {
+                AllTasks = tasks;
+                startCalendar(CalYear, CalMonth, true);
+            });
+        }
+    }
 }
 
-function editTask(id, name, desc, labeli, labelt, priority) {
-    if (BoxClicked) {
-        BoxClicked = false;
-    } else {
-        document.getElementById("etempid").textContent = id;
-        document.getElementById("etasknamefield").value = name;
-        if (desc != undefined) {
-            document.getElementById("etaskdescfield").value = desc;
-        }
-        document.getElementById("etasklabelfield").value = labelt;
-        if (labeli == "") {
-            document.getElementById("editTask-selectoricon").textContent = "star";
+function editTask(id, name, desc, date, priority, repeat) {
+    if (CurrentMode == 0) {
+        if (BoxClicked) {
+            BoxClicked = false;
         } else {
-            document.getElementById("editTask-selectoricon").textContent = labeli;
+            document.getElementById("etempid").textContent = id;
+            document.getElementById("etasknamefield").value = name;
+            document.getElementById("etaskrepeatfield").value = repeat;
+            if (desc != undefined) {
+                document.getElementById("etaskdescfield").value = desc;
+            }
+            document.getElementById("etaskdatefield").value = date;
+            if (priority) {
+                document.getElementById("etaskpriorityfield").checked = true;
+            } else {
+                document.getElementById("etaskpriorityfield").checked = false;
+            }
+            document.getElementById("editTask").show();
         }
-        if (priority) {
-            document.getElementById("etaskpriorityfield").checked = true;
-        } else {
-            document.getElementById("etaskpriorityfield").checked = false;
-        }
-        document.getElementById("editTask").show();
     }
 }
 function finalizeTaskEdit() {
-    if (document.getElementById("etasklabelfield").value == "") {
-        licon = "";
-    } else {
-        licon = document.getElementById("editTask-selectoricon").textContent;
-    }
-    apiRequest("tasks/add?list=" + CurrentList, "POST", true, JSON.stringify({
+    apiRequest("tasks/add?list=" + TasksObject[document.getElementById("etempid").textContent]["list"], "POST", false, JSON.stringify({
         "id": document.getElementById("etempid").textContent,
         "name": document.getElementById("etasknamefield").value,
         "description": document.getElementById("etaskdescfield").value,
-        "labelicon": licon,
-        "label": document.getElementById("etasklabelfield").value,
-        "priority": document.getElementById("etaskpriorityfield").checked
+        "date": document.getElementById("etaskdatefield").value,
+        "priority": document.getElementById("etaskpriorityfield").checked,
+        "repeat": document.getElementById("etaskrepeatfield").value
     }))
-    document.getElementById("editTask").close();
-    getTasks(CurrentList);
+    setTimeout(function() {
+        getTasks(CurrentList);
+        document.getElementById("editTask").close();
+    },500)
 }
 
 function listSwitch() {
@@ -315,7 +516,7 @@ function reload2() {
     var statusReturn = apiRequest("competition/get", "GET", true, "", true);
     statusReturn.then(function (status) {
         if (status["status"] == 200) {
-            setCompetitionStatus(status["data"]["name"], status["data"]["competitor"], status["data"]["user1"], status["data"]["user2"], status["data"]["finish"])
+            setCompetitionStatus(status["data"]["competitor"], status["data"]["user1"], status["data"]["user2"], status["data"]["finish"])
         }
     })
     getTasks(CurrentList);
@@ -647,9 +848,8 @@ function switchColor(rgb, noset) {
 }
 CompetitionOn = false;
 // Competition
-function setCompetitionStatus(name, user2, status2, status1, total) {
+function setCompetitionStatus(user2, status2, status1, total) {
     CompetitionOn = true;
-    document.getElementById("cname").textContent = name;
     document.getElementById("user2name").textContent = user2;
 
     var percent1 = (new Number(status1) / new Number(total));
@@ -661,11 +861,11 @@ function setCompetitionStatus(name, user2, status2, status1, total) {
     document.getElementById("sbar2").value = percent2;
     document.getElementById("nstat1").textContent = `${status1}/${total} (${Math.round(percent1*100)}%)`;
     document.getElementById("nstat2").textContent = `${status2}/${total} (${Math.round(percent2*100)}%)`;
-    document.getElementById("cName").textContent = name;
     document.getElementById("cname1").textContent = localStorage.getItem("username");
     document.getElementById("cname2").textContent = user2;
 
-    document.getElementById("competition").style.display = "flex";
+    document.getElementById("content").classList.add("cstarted");
+
     setTimeout(function () {
         if (status1 == total) {
             document.getElementById("win").style.display = "flex";
@@ -675,6 +875,9 @@ function setCompetitionStatus(name, user2, status2, status1, total) {
             document.getElementById("lose").style.display = "flex";
             var winner = user2;
             document.getElementById("abandonBtn").disabled = true;
+        } else {
+            document.getElementById("lose").style.display = "none";
+            document.getElementById("win").style.display = "none";
         }
         setTimeout(function () {
             if (status1 >= total || status2 >= total) {
@@ -717,7 +920,6 @@ function competitionFriendCallback(opens) {
 }
 function startCompetition() {
     var statusReturn = apiRequest("competition/start", "POST", true, JSON.stringify({
-        "name": document.getElementById("compName").value,
         "competitor": document.getElementById("ctaskAgainst").value,
         "finish": document.getElementById("tasksAmount").value
     }), true);
@@ -727,13 +929,15 @@ function startCompetition() {
             document.getElementById("cferror").textContent = "This person is already in a competition.";
         } else {
             document.getElementById("startCompetition").close();
-            setCompetitionStatus(document.getElementById("compName").value, document.getElementById("ctaskAgainst").value, 0, 0, document.getElementById("tasksAmount").value)
+            setCompetitionStatus(document.getElementById("ctaskAgainst").value, 0, 0, document.getElementById("tasksAmount").value)
             document.getElementById("startCompetitionForm").reset();
         }
     })
 }
 function dismissCompetition() {
-    document.getElementById('competition').style.display = 'none';
+    document.getElementById("content").classList.remove("cstarted");
+    document.getElementById("lose").style.display = "none";
+    document.getElementById("win").style.display = "none";
     apiRequest("competition/dismiss", "POST", true);
     CompetitionOn = false;
 }
@@ -744,8 +948,10 @@ function openAbandonCompetition() {
 function abandonCompetition() {
     document.getElementById('abandonCompetition').close();
     apiRequest("competition/abandon", "POST", true);
-    document.getElementById('competition').style.display = 'none';
+    document.getElementById("content").classList.remove("cstarted");
     CompetitionOn = false;
+    document.getElementById("lose").style.display = "none";
+    document.getElementById("win").style.display = "none";
 }
 
 // Feedback
@@ -773,6 +979,226 @@ function feedbackEmail() {
         document.getElementById('fEmail').required = true;
     } else {
         document.getElementById('fEmail').required = false;
+    }
+}
+
+const anchorEl1 = document.body.querySelector('#menu-anchor');
+const menuEl1 = document.body.querySelector('#menu-menu');
+anchorEl1.addEventListener('click', () => { menuEl1.open = !menuEl1.open; });
+
+const anchorEl2 = document.body.querySelector('#modeswitchanchor');
+const menuEl2 = document.body.querySelector('#modesmenu');
+anchorEl2.addEventListener('click', () => { menuEl2.open = !menuEl2.open; });
+
+function deleteTask(id) {
+    apiRequest("tasks/delete?list=" + TasksObject[id]["list"], "DELETE", false, id);
+    document.querySelectorAll("#" + id).forEach(function (element) {
+        element.remove();
+    });
+    if (!document.querySelector(".task")) {
+        document.querySelector(".notasks").style.display = "block";
+    }
+}
+
+// Calendar
+function startCalendar(curyear, curmonth, noanim) {
+    DatesJSON = {};
+    if (AllTasks != null) {
+        Object.values(AllTasks).forEach(function (listcontent) {
+            Inter = 0;
+            Object.values(listcontent).forEach(function (taskcontent) {
+                if (taskcontent["date"] != "") {
+                    taskcontent["id"] = Object.keys(listcontent)[Inter];
+                    if (DatesJSON[taskcontent["date"]] == undefined) {
+                        DatesJSON[taskcontent["date"]] = [taskcontent];
+                    } else {
+                        DatesJSON[taskcontent["date"]].push(taskcontent);
+                    }
+                }
+                if (taskcontent["list"] != undefined) {
+                    TasksObject[Object.keys(listcontent)[Inter]] = taskcontent;
+                }
+                Inter = Inter + 1;
+            })
+        })
+    }
+    var daysincur = getDaysInMonth(curyear, curmonth);
+    var firstcurday = getFirstDayOfMonth(curyear, curmonth);
+    document.getElementById("calendargrid").innerHTML = "";
+    numberToArray(firstcurday).forEach(function () {
+        addCalendarItem(0, 1)
+    });
+    for (let index = 0; index < numberToArray(daysincur).length; index++) {
+        if (noanim) {
+            var timeouttime = 0;
+        } else {
+            var timeouttime = index*10;
+        }
+        const element = numberToArray(daysincur)[index];
+        setTimeout(() => {
+            if (element == new Date().getDate() && new Date().getMonth() + 1 == curmonth) {
+                addCalendarItem(element, 2, noanim);
+            } else {
+                addCalendarItem(element, 0, noanim);
+            }
+        }, timeouttime);
+    }
+    document.getElementById("mnyear").textContent = curyear;
+    document.getElementById("mnmonth").textContent = getMonthName(curmonth);
+    CalYear = curyear;
+    CalMonth = curmonth;
+}
+function addCalendarItem(number, type, noanim) {
+    if (type == 0 || type == 2) {
+        var calelem = document.createElement("div");
+        var caltext = document.createElement("span");
+        var minitasks = document.createElement("div");
+        var caripple = document.createElement("md-ripple");
+        calelem.classList.add("calendarbox");
+        if (noanim) {
+            calelem.classList.add("noanim");
+        }
+        if (type == 2) {
+            calelem.classList.add("cbtoday");
+        }
+        caltext.classList.add("daynum");
+        minitasks.classList.add("minitasks");
+        calelem.appendChild(caltext);
+        calelem.appendChild(minitasks);
+        calelem.appendChild(caripple);
+        document.getElementById("calendargrid").appendChild(calelem);
+        caltext.textContent = number;
+        var tempdate = new Date();
+        tempdate.setDate(number);
+        tempdate.setFullYear(CalYear);
+        tempdate.setMonth(CalMonth - 1);
+        var month = String(tempdate.getMonth() + 1).padStart(2, '0');
+        var day = String(tempdate.getDate()).padStart(2, '0');
+        var datestring = `${CalYear}-${month}-${day}`;
+        if (DatesJSON[datestring] != undefined) {
+            DatesJSON[datestring].forEach(function (numdaytask) {
+                var minitask = document.createElement("div");
+                minitask.classList.add("minitask");
+                minitask.textContent = numdaytask["name"];
+                minitasks.appendChild(minitask);
+            })
+            var calbadge = document.createElement("div");
+            calbadge.classList.add("calbadge");
+            calbadge.textContent = DatesJSON[datestring].length;
+            calelem.appendChild(calbadge);
+        }
+        calelem.onclick = function () {
+            loadTasksIntoDayModal(datestring)
+        }
+    } else if (type == 1) {
+        var calelem = document.createElement("div");
+        calelem.classList.add("calendarbox");
+        calelem.classList.add("cbempty");
+        document.getElementById("calendargrid").appendChild(calelem);
+    }
+}
+function switchMonth() {
+    switch (event.target.id) {
+        case "msforwardbtn":
+            if (CalMonth == 12) {
+                startCalendar(CalYear + 1, 1);
+            } else {
+                startCalendar(CalYear, CalMonth + 1);
+            }
+            break;
+        case "msbackwardbtn":
+            if (CalMonth == 1) {
+                startCalendar(CalYear - 1, 12);
+            } else {
+                startCalendar(CalYear, CalMonth - 1);
+            }
+    }
+}
+function loadTasksIntoDayModal(date) {
+    document.getElementById("calendartasksholder").innerHTML = "";
+    if (DatesJSON[date] != undefined) {
+        DatesJSON[date].forEach(function (element) {
+            createTaskElem(
+                element["name"],
+                element["description"],
+                element["date"],
+                element["id"],
+                element["priority"],
+                element["repeat"],
+                document.getElementById("calendartasksholder"));
+        })
+        document.getElementById("nodatetasks").style.display = "none";
+    } else {
+        document.getElementById("nodatetasks").style.display = "block";
+    }
+    document.getElementById("calendartasks").show();
+    dateparsed = new Date(date);
+    dateparsed.setMonth(dateparsed.getMonth());
+    dateparsed.setDate(dateparsed.getDate() + 1);
+    document.getElementById("calendarmodaldate").textContent = dateparsed.toDateString().split(' ').slice(1).join(' ');;
+}
+
+// Whiteboard
+function startWhiteboard() {
+    document.getElementById("whiteboardcontent").innerHTML = "";
+    ListNames = [];
+    for (let index = 0; index < Object.values(AllTasks).length; index++) {
+        const element = Object.values(AllTasks)[index];
+        if (element["name"] != undefined) {
+            ListNames.push(element["name"]);
+        } else {
+            ListNames.push("Main List");
+        }
+    }
+    if (AllTasks != null) {
+        Object.values(AllTasks).forEach(function (listcontent) {
+            Inter = 0;
+            Object.values(listcontent).forEach(function (taskcontent) {
+                if (taskcontent["list"] != undefined) {
+                    TasksObject[Object.keys(listcontent)[Inter]] = taskcontent;
+                }
+                Inter = Inter + 1;
+            })
+        })
+    }
+    for (let index = 0; index < Object.values(AllTasks).length; index++) {
+        const list = Object.values(AllTasks)[index];
+        
+        const wbbox = document.createElement("div");
+        wbbox.classList.add("whiteboardbox");
+        document.getElementById("whiteboardcontent").appendChild(wbbox);
+
+        var wbname = document.createElement("div");
+        wbname.classList.add("whiteboardname");
+        wbname.textContent = ListNames[index];
+        wbbox.appendChild(wbname);
+
+        if (Object.values(list).length == 1 && list["name"]) {
+            var wbtask = document.createElement("div");
+            wbtask.textContent = "No tasks on this list.";
+            wbtask.classList.add("notaskswhiteboard");
+            wbbox.appendChild(wbtask);
+        } else {
+            for (let index = 0; index < Object.values(list).length; index++) {
+                const task = Object.values(list)[index];
+                
+                if (Object.keys(list)[index] != "name") {
+                    createTaskElem(
+                        task["name"],
+                        task["description"],
+                        task["date"],
+                        Object.keys(list)[index],
+                        task["priority"],
+                        task["repeat"],
+                        wbbox);
+                }
+            }
+        }
+    }
+    if (document.getElementById("whiteboardcontent").innerHTML == "") {
+        document.getElementById("whiteboardlistsempty").style.display = "flex";
+    } else {
+        document.getElementById("whiteboardlistsempty").style.display = "none";
     }
 }
 
@@ -810,10 +1236,6 @@ function apiRequest(endpoint, type, async, send, withstatus) {
         xhr.send(send);
     })
 }
-
-const anchorEl = document.body.querySelector('#menu-anchor');
-const menuEl = document.body.querySelector('#menu-menu');
-anchorEl.addEventListener('click', () => { menuEl.open = !menuEl.open; });
 
 function logOut() {
     localStorage.clear();
