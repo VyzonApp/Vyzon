@@ -231,7 +231,7 @@ function createTaskElem(name, description, datet, taskid, priority, repeat, cont
     datetext.classList.add("datetext")
 
     if (priority) {
-        date.classList.add("priorityt");
+        label.classList.add("priorityt");
     }
 
     elem.appendChild(label);
@@ -645,57 +645,58 @@ function friendListOpen(flo) {
     if (flo != true) {
         document.getElementById("friendList").show();
     }
-    if (LoadedFriends == false) {
-        LoadedFriends = true;
-        var friendsPromise = apiRequest("friends/get", "GET", false);
-        friendsPromise.then(function(result) {
-            document.getElementById("cpf1").remove();
-            document.getElementById("cpf2").remove();
-            if (result != null) {
-                var resultparsed = result;
-            } else {
-                var resultparsed = {};
+    LoadedFriends = true;
+    document.getElementById("friendRows").innerHTML = "";
+    document.getElementById("finc").innerHTML = "";
+    document.getElementById("fout").innerHTML = "";
+    document.getElementById("listuserfield").innerHTML = "";
+    document.getElementById("ctaskAgainst").innerHTML = "";
+    var friendsPromise = apiRequest("friends/get", "GET", false);
+    friendsPromise.then(function(result) {
+        if (result != null) {
+            var resultparsed = result;
+        } else {
+            var resultparsed = {};
+        }
+        if (resultparsed["requestsin"] == undefined && resultparsed["requestsout"] == undefined) {
+            document.getElementById("roast1").textContent = "You have no requests."
+        } else {
+            if (resultparsed["requestsin"] != undefined) {
+                Object.keys(resultparsed["requestsin"]).forEach(function (item) {
+                    generateFriendElem(0, item)
+                    Famount = Famount + 1;
+                    displayFbadge();
+                })
             }
-            if (resultparsed["requestsin"] == undefined && resultparsed["requestsout"] == undefined) {
-                document.getElementById("roast1").textContent = "You have no requests."
-            } else {
-                if (resultparsed["requestsin"] != undefined) {
-                    Object.keys(resultparsed["requestsin"]).forEach(function (item) {
-                        generateFriendElem(0, item)
-                        Famount = Famount + 1;
-                        displayFbadge();
-                    })
-                }
-                if (resultparsed["requestsout"] != undefined) {
-                    Object.keys(resultparsed["requestsout"]).forEach(function (item) {
-                        generateFriendElem(1, item)
-                    })
-                }
+            if (resultparsed["requestsout"] != undefined) {
+                Object.keys(resultparsed["requestsout"]).forEach(function (item) {
+                    generateFriendElem(1, item)
+                })
             }
-            if (resultparsed["friends"] == undefined) {
-                document.getElementById("roast2").textContent = "You have no friends."
+        }
+        if (resultparsed["friends"] == undefined) {
+            document.getElementById("roast2").textContent = "You have no friends."
+        } else {
+            if (resultparsed["friends"] != undefined) {
+                FriendArray = Object.keys(resultparsed["friends"])
+                Object.keys(resultparsed["friends"]).forEach(function (item) {
+                    generateFriendElem(2, item)
+                })
             } else {
-                if (resultparsed["friends"] != undefined) {
-                    FriendArray = Object.keys(resultparsed["friends"])
-                    Object.keys(resultparsed["friends"]).forEach(function (item) {
-                        generateFriendElem(2, item)
-                    })
-                } else {
-                    FriendArray = []
-                }
-                FriendArray.forEach(element => {
-                    var mdso = document.createElement("md-select-option");
-                    mdso.textContent = element;
-                    mdso.value = element;
-                    var mdso2 = document.createElement("md-select-option");
-                    mdso2.textContent = element;
-                    mdso2.value = element;
-                    document.getElementById("ctaskAgainst").appendChild(mdso);
-                    document.getElementById("listuserfield").appendChild(mdso2);
-                });
+                FriendArray = []
             }
-        })
-    }
+            FriendArray.forEach(element => {
+                var mdso = document.createElement("md-select-option");
+                mdso.textContent = element;
+                mdso.value = element;
+                var mdso2 = document.createElement("md-select-option");
+                mdso2.textContent = element;
+                mdso2.value = element;
+                document.getElementById("ctaskAgainst").appendChild(mdso);
+                document.getElementById("listuserfield").appendChild(mdso2);
+            });
+        }
+    })
     addRoasts()
 }
 friendListOpen(true)
