@@ -1,11 +1,26 @@
 window.onload = function () {
-    if (localStorage.getItem("username") == null) {
-        document.getElementById("loginNotice").show();
-    } else {
-        document.querySelector(".openinfo").style.display = "none";
-        if (localStorage.getItem('modalVersion') != Version.slice(0, 7)) {
-            document.getElementById('newVersion').show();
+    const params = new URL(location).searchParams;
+    if (params.get("code") == undefined) {
+        if (localStorage.getItem("token") == null) {
+            if (localStorage.getItem("password") == null) {
+                document.getElementById("loginNotice").show();
+            } else {
+                location = "https://milnm.com/auth.html?url=dnl6b24uYXBw&migrate=" + btoa(JSON.stringify({"Username":localStorage.getItem("username"),"Password":localStorage.getItem("password")}))
+            }
+        } else {
+            document.querySelector(".openinfo").style.display = "none";
+            if (localStorage.getItem('modalVersion') != Version.slice(0, 7)) {
+                document.getElementById('newVersion').show();
+            }
+            var statusReturn = apiRequest("+https://api.milnm.com/account/validatetoken", "POST", true, localStorage.getItem("token"));
+            statusReturn.then(function (name) {
+                localStorage.setItem("username", name);
+                document.getElementById("usernameacc").textContent = localStorage.getItem("username");
+            })
         }
+    } else {
+        localStorage.setItem("token", params.get("code"));
+        location = "/"
     }
 }
 if (navigator.userAgent.indexOf('AppleWebKit') != -1) {
@@ -497,7 +512,6 @@ function deleteList() {
         getLists();
     }, 500);
 }
-document.getElementById("usernameacc").textContent = localStorage.getItem("username");
 
 function iconSelect(modal) {
     document.getElementById(modal).close();
@@ -1207,9 +1221,12 @@ function startWhiteboard() {
 function apiRequest(endpoint, type, async, send, withstatus) {
     return new Promise((resolve, reject) => {
         const xhr = new XMLHttpRequest();
-        xhr.open(type, "https://api.vyzon.app/" + endpoint, async);
-        xhr.setRequestHeader("Username", localStorage.getItem("username"));
-        xhr.setRequestHeader("Password", localStorage.getItem("password"));
+        if (endpoint.charAt(0) == "+") {
+            xhr.open(type, endpoint.substring(1), async);
+        } else {
+            xhr.open(type, "https://api.vyzon.app/" + endpoint, async);
+        }
+        xhr.setRequestHeader("token", localStorage.getItem("token"));
         xhr.onload = function () {
             if (withstatus) {
                 try {
@@ -1241,21 +1258,4 @@ function apiRequest(endpoint, type, async, send, withstatus) {
 function logOut() {
     localStorage.clear();
     location.reload();
-}
-function changePassword() {
-    if (document.getElementById("newpassword").value == document.getElementById("confirmpassword").value) {
-        event.target.disabled = true;
-        apiRequest("account/changepassword", "POST", false, document.getElementById("newpassword").value)
-        localStorage.setItem("password", document.getElementById("newpassword").value);
-        event.target.parentElement.close();
-        document.getElementById("cperror").textContent = "";
-        document.getElementById("changePasswordForm").reset();
-    } else {
-        document.getElementById("cperror").textContent = "Passwords must match!";
-    }
-}
-function deleteAccount() {
-    event.target.disabled = true;
-    apiRequest("account/delete", "POST", false);
-    logOut();
 }

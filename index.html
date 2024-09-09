@@ -209,17 +209,6 @@
                 <md-icon-button id="acc-anchor" onclick="document.getElementById('accountInfo').show()">
                     <md-icon>account_circle</md-icon>
                 </md-icon-button>
-                <md-menu anchor="acc-anchor" onclick="document.getElementById('addTask').show()">
-                    <md-menu-item>
-                        <div slot="headline" onclick="logOut()">Log Out</div>
-                    </md-menu-item>
-                    <md-menu-item>
-                        <div slot="headline" onclick="document.getElementById('changePassword').show()">Change Password</div>
-                    </md-menu-item>
-                    <md-menu-item>
-                        <div slot="headline" onclick="document.getElementById('deleteAccount').show()">Delete Account</div>
-                    </md-menu-item>
-                </md-menu>
             </span>
         </div>
         <div class="contentHolder" id="chTasks">
@@ -522,28 +511,7 @@
                 <md-icon-button onclick="location.reload()" class="reloadbtn"><md-icon>refresh</md-icon></md-icon-button>
             </div>
             <form slot="content" id="accountModal" onsubmit="event.preventDefault(); document.getElementById('accountInfo').close(); return false">
-                <md-menu>
-                    <md-menu-item>
-                        <div slot="headline" onclick="logOut()">Log Out</div>
-                    </md-menu-item>
-                    <md-menu-item>
-                        <div slot="headline" onclick="document.getElementById('changePassword').show()">Change Password</div>
-                    </md-menu-item>
-                    <md-menu-item>
-                        <div slot="headline" onclick="document.getElementById('deleteAccount').show()">Delete Account</div>
-                    </md-menu-item>
-                </md-menu>
-                <md-tabs>
-                    <md-primary-tab selected style="display:none"></md-primary-tab>
-                    <md-primary-tab onclick="document.getElementById('accountInfo').close(); document.getElementById('deleteAccount').show()">
-                        <md-icon slot="icon">delete</md-icon>
-                        Delete Account
-                    </md-primary-tab>
-                    <md-primary-tab onclick="document.getElementById('accountInfo').close(); document.getElementById('changePassword').show()">
-                        <md-icon slot="icon">lock</md-icon>
-                        Change Password
-                    </md-primary-tab>
-                </md-tabs>
+                <span style="padding-top:10px;display:flex">More options are coming to this page soon.</span>
                 <span style="padding-top:10px;display:flex">&copy; 2024 Milenium. All rights reserved.</span>
             </form>
             <div slot="actions">
@@ -768,8 +736,7 @@
                 <div>To access Vyzon, you need to either log in or create an account.</div>
             </div>
             <div slot="actions">
-                <a class="notlink" href="/register.html"><md-text-button>Register</md-text-button></a>
-                <a class="notlink" href="/login.html"><md-filled-button>Log In</md-filled-button></a>
+                <a class="notlink" href="https://milnm.com/auth.html?url=dnl6b24uYXBw"><md-filled-button>Continue</md-filled-button></a>
             </div>
         </md-dialog>
 
@@ -798,7 +765,7 @@
     </body>
 
     <script>
-        Version = "24.09.1.1";
+        Version = "24.09.1.2";
         if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
             document.getElementById("lmodestyle").media = "max-width: 1px";
             document.getElementById("dmodestyle").media = "";
