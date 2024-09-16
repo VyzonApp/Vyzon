@@ -8,12 +8,6 @@ if (navigator.userAgent.indexOf('AppleWebKit') != -1) {
 } else {
     DateOffset = 0
 }
-var statusReturn = apiRequest("competition/get", "GET", true, "", true);
-statusReturn.then(function (status) {
-    if (status["status"] == 200) {
-        setCompetitionStatus(status["data"]["competitor"], status["data"]["user1"], status["data"]["user2"], status["data"]["finish"])
-    }
-})
 
 function getFirstDayOfMonth(year, month) {
     return new Date(year, month - 1, 1).getDay();
@@ -136,10 +130,8 @@ function getLists() {
     })
 }
 
-window.addEventListener("load", function () {
-    getLists();
-    getSettings();
-});
+getSettings();
+getLists();
 
 function addNewTask() {
     var addTaskPromise = apiRequest("tasks/add?list=" + CurrentList, "POST", true, JSON.stringify({
@@ -683,7 +675,6 @@ function friendListOpen(flo) {
     })
     addRoasts()
 }
-friendListOpen(true)
 function displayFbadge() {
     if (Famount == 0) {
         document.getElementById("friendRequests").style.display = "none";

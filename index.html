@@ -158,6 +158,10 @@
             .feedbtn {
                 --md-fab-container-color: rgb(240,200,255);
             }
+            .socials img {
+                filter: invert(100%);
+                -webkit-filter: invert(100%);
+            }
         </style>
         <style id="profileStyle"></style>
     </head>
@@ -549,6 +553,7 @@
                         <span class="switchlabel">Enable Feedback</span>
                         <md-switch id="setting2" selected onchange="setSetting(2, event.target.selected)"></md-switch>
                     </label>
+                    &copy; 2024 <a href="https://milnm.com">Milenium</a>. All rights reserved.
                 </div>
                 <div id="settingsGroup1" class="settingsGroup">
                     <label class="switch">
@@ -731,13 +736,18 @@
                 <p><small>Psst - if you encounter any bugs or have any suggestions for the next update, feel free to use the feedback button in the bottom left of your task list. It really helps!</small></p>
             </div>
             <div slot="actions">
+                <div class="socials">
+                    <md-icon-button><img src="/assets/images/in.png" /></md-icon-button>
+                    <md-icon-button><img src="/assets/images/yt.png" /></md-icon-button>
+                    <md-icon-button><img src="/assets/images/x.png" /></md-icon-button>
+                </div>
                 <md-filled-button onclick="document.getElementById('newVersion').close();">OK</md-filled-button>
             </div>
         </md-dialog>
     </body>
 
     <script>
-        Version = "24.09.2.0";
+        Version = "24.09.2.1";
         if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
             document.getElementById("lmodestyle").media = "max-width: 1px";
             document.getElementById("dmodestyle").media = "";

@@ -811,7 +811,7 @@ md-menu {
     display: flex;
     align-items: center;
     border-radius: 15px;
-    white-space: pre;
+    white-space: pre-line;
 }
 #pfabtme:focus {
     outline: none;
@@ -870,6 +870,14 @@ md-menu {
 #resetColorBtn {
     height: fit-content;
     display: none;
+}
+.socials {
+    margin-right: auto;
+    display: flex;
+}
+.socials img {
+    height: auto;
+    transform: scale(0.75);
 }
 
 /* Mobile */
