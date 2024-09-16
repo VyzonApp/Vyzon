@@ -159,6 +159,7 @@
                 --md-fab-container-color: rgb(240,200,255);
             }
         </style>
+        <style id="profileStyle"></style>
     </head>
     <body>
         <div class="openinfo"></div>
@@ -206,7 +207,7 @@
                 
             </h1>
             <span style="position: relative">
-                <md-icon-button id="acc-anchor" onclick="document.getElementById('accountInfo').show()">
+                <md-icon-button id="acc-anchor" onclick="loadUserProfile()">
                     <md-icon>account_circle</md-icon>
                 </md-icon-button>
             </span>
@@ -436,21 +437,6 @@
                 <md-filled-button form="addListForm">Create</md-filled-button>
             </div>
         </md-dialog>
-        <md-dialog id="iconSelect">
-            <div slot="headline">Select an icon</div>
-            <span id="tempreturnmodal"></span>
-            <form slot="content" id="iconSelectForm" onsubmit="event.preventDefault(); return false">
-                <md-text-button class="iconselect" onclick="returnIcon();"><md-icon>star</md-icon></md-text-button>
-                <md-text-button class="iconselect" onclick="returnIcon();"><md-icon>bolt</md-icon></md-text-button>
-                <md-text-button class="iconselect" onclick="returnIcon();"><md-icon>block</md-icon></md-text-button>
-                <md-text-button class="iconselect" onclick="returnIcon();"><md-icon>paid</md-icon></md-text-button>
-                <md-text-button class="iconselect" onclick="returnIcon();"><md-icon>sell</md-icon></md-text-button>
-                <md-text-button class="iconselect" onclick="returnIcon();"><md-icon>fitness_center</md-icon></md-text-button>
-                <md-text-button class="iconselect" onclick="returnIcon();"><md-icon>shopping_cart</md-icon></md-text-button>
-                <md-text-button class="iconselect" onclick="returnIcon();"><md-icon>schedule</md-icon></md-text-button>
-                <md-text-button class="iconselect" onclick="returnIcon();"><md-icon>event_note</md-icon></md-text-button>
-            </form>
-        </md-dialog>
         <md-dialog id="delList">
             <div slot="headline">Delete a list</div>
             <form slot="content" id="delListForm" onsubmit="event.preventDefault(); deleteList(); return false">
@@ -464,59 +450,43 @@
                 <md-filled-button form="delListForm">Delete</md-filled-button>
             </div>
         </md-dialog>
-        <md-dialog id="changePassword">
-            <div slot="headline">Change password</div>
-            <form slot="content" id="changePasswordForm" onsubmit="event.preventDefault(); changePassword(); return false">
-                <div slot="headline" id="cperror"></div>
-                <md-outlined-text-field
-                    id="newpassword"
-                    class="field desc"
-                    type="password"
-                    label="New Password"
-                    required
-                    error-text="Your password must be\n8 characters minimum\n30 characters maximum\nCan't contain spaces"
-                    minlength="8" maxlength="20" pattern="^\S*$">
-                </md-outlined-text-field>
-                <md-outlined-text-field
-                    id="confirmpassword"
-                    class="field desc"
-                    type="password"
-                    label="Confirm Password"
-                    required
-                    error-text="Password does not match.">
-                </md-outlined-text-field>
-                <div slot="headline" class="desc">Your password must meet the following requirements:<br>
-                    8 characters minimum<br>
-                    30 characters maximum<br>
-                    Can't contain spaces
-                </div>
-            </form>
-            <div slot="actions">
-                <md-filled-button form="changePasswordForm">Change Password</md-filled-button>
-            </div>
-        </md-dialog>
-        <md-dialog id="deleteAccount">
-            <div slot="headline">Delete Account</div>
-            <form slot="content" id="deleteAccountForm" onsubmit="event.preventDefault(); deleteAccount(); return false">
-                <div class="desc">This action will delete all your data and is irreversible.</div>
-                <div style="color: red">Are you sure you want to proceed?</div>
-            </form>
-            <div slot="actions">
-                <md-filled-button form="deleteAccountForm" class="delpasswordbtn">Delete</md-filled-button>
-            </div>
-        </md-dialog>
         <md-dialog id="accountInfo">
             <div slot="headline">
-                <img src="/assets/images/nprofile.svg" class="pfp" /> <span id="usernameacc"></span>
-                <md-icon-button onclick="location.reload()" class="reloadbtn"><md-icon>refresh</md-icon></md-icon-button>
+                <md-icon-button onclick="editProfile()" class="reloadbtn"><md-icon>edit</md-icon></md-icon-button>
+                <span id="usernameacc"></span>
             </div>
             <form slot="content" id="accountModal" onsubmit="event.preventDefault(); document.getElementById('accountInfo').close(); return false">
-                <span style="padding-top:10px;display:flex">More options are coming to this page soon.</span>
-                <span style="padding-top:10px;display:flex">&copy; 2024 Milenium. All rights reserved.</span>
             </form>
             <div slot="actions">
                 <md-text-button onclick="logOut()">Log Out</md-text-button>
                 <md-filled-button form="accountModal">Close</md-filled-button>
+            </div>
+        </md-dialog>
+        <md-dialog id="profile">
+            <div slot="headline">
+                <span id="pfusername"></span>
+                <md-filled-icon-button id="profilebtn" onclick="profileBtn()" class="profilebtn"><md-icon></md-icon></md-filled-icon-button>
+            </div>
+            <form slot="content" id="profileForm" onsubmit="event.preventDefault(); document.getElementById('profile').close()">
+                <span id="pfabtme"></span>
+                <div class="accountoptions" id="accountoptions">
+                    <div class="colorOption">
+                        <input type="color" class="editColor" id="colorInputPrimary" />
+                        <label for="colorInputPrimary">Primary</label>
+                    </div>
+                    <div class="colorOption">
+                        <input type="color" class="editColor" id="colorInputSecondary" />
+                        <label for="colorInputSecondary">Secondary</label>
+                    </div>
+                    <div class="colorOption">
+                        <input type="text" class="editFont" id="fontInput" />
+                        <label for="fontInput">Font</label>
+                    </div>
+                </div>
+            </form>
+            <div slot="actions">
+                <md-text-button onclick="resetColors()" id="resetColorBtn">Reset</md-text-button>
+                <md-text-button form="profileForm">Close</md-text-button>
             </div>
         </md-dialog>
         <md-dialog id="friendList">
@@ -622,6 +592,9 @@
                     </div>
                     Even more beautiful colors are coming soon, stay tuned!
                 </div>
+            </div>
+            <div slot="actions">
+                <md-filled-button onclick="logOut();">Log Out</md-filled-button>
             </div>
         </md-dialog>
         <md-dialog id="startCompetition">
@@ -741,18 +714,17 @@
         </md-dialog>
 
         <md-dialog id="newVersion" onclose="localStorage.setItem('modalVersion', Version.slice(0, 7))">
-            <div slot="headline">Let's get organized!</div>
+            <div slot="headline">Express yourself with Vyzon</div>
             <div slot="content" id="nVContent">
-                <img src="/assets/images/image1.png" width="100%" draggable="false" style="border-radius:20px;margin-top: 5px" />
-                <p>School's coming up, and we're here to help with that, so here's what's new.</p>
+                <img src="/assets/images/image2.png" width="100%" draggable="false" style="border-radius:20px;margin-top: 5px" />
+                <p>Vyzon is always built with security in mind from the ground up. Here's some updates we've been working on to continue our mission to create the best to-do list.</p>
                 <br>
-                <p><b>Dates:</b> Looks like labels aren't the most popular, so we're introducing a much more useful feature to take its place - dates! You can easily set a due date for an task and Vyzon will let you know how long until it expires.</p>
-                <p><b>Calendar:</b> Introducing Vyzon Calendar! To compliment dates, you can tap on the header at the top of the app to switch to Calendar mode. Calendar mode is a new interface that will show you all the tasks with dates in one place. You can switch between months and tap on days to see the task descriptions too!</p>
-                <p><b>Whiteboard Mode:</b> If all that wasn't enough, you can also get all your lists in one spread out view with Whiteboard Mode! Cast it with a projector or TV and it is perfect for showing everyone what they need to do at a glance.</p>
-                <p><b>Repeating Tasks:</b> Sometimes tasks happen more than once. Instead of recreating them every single day, you can now set a task to repeat every day, week, month, or year!</p>
-                <p><b>Deleting Tasks:</b> You can also delete a task from the edit menu without completing it, so it doesn't count towards competition.</p>
+                <p><b>Profiles:</b> You can add custom colors, a custom font, and a bio to your profile that displays itself when users click your name on the friends list. To customize, go to the new account menu.</p>
+                <p><b>Milenium Accounts:</b> Milenium accounts are here! They're a better and more secure way to access Vyzon. Plus, you'll be able to use the same account for future Milenium services, and your profile and friends will be synced across every one of them.</p>
+                <p><b>New Legal Documents:</b> By using Vyzon and all other Milenium services, you now will have to follow the policies of all our legal documents. To view them, you can go to <a href="https://milnm.com/info">https://milnm.com/info</a> at any time.</p>
+                <p><b>Tokens:</b> Logging into your account is now more secure! Your login details are hidden and each logged in device has its own individual "secret" password called a token. This prevents hackers from stealing your password!</p>
                 <br>
-                <p>Whether you're in school or not, we're sure this update will be great at keeping you on time and ready for whatever comes next. Enjoy!</p>
+                <p>We're so excited to see what users do with these updates and how your account is kept far more secure. Have fun customizing your profile! We're excited to see what you create.</p>
                 <br>
                 <p>- The Vyzon Team</p>
                 <br>
@@ -765,7 +737,7 @@
     </body>
 
     <script>
-        Version = "24.09.1.2";
+        Version = "24.09.2.0";
         if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
             document.getElementById("lmodestyle").media = "max-width: 1px";
             document.getElementById("dmodestyle").media = "";
@@ -776,9 +748,75 @@
         } else {
             document.querySelector(".beta").style.display = "none";
         }
-        var scpt = document.createElement("script");
-        scpt.src = "/assets/script/script.js?v=" + Version;
-        document.body.appendChild(scpt);
         document.getElementById("styleelem").href = "/assets/script/styles.css?v=" + Version;
+        window.onload = function () {
+            const params = new URL(location).searchParams;
+            if (params.get("code") == undefined) {
+                if (localStorage.getItem("token") == null) {
+                    if (localStorage.getItem("password") == null) {
+                        document.getElementById("loginNotice").show();
+                    } else {
+                        location = "https://milnm.com/auth.html?url=dnl6b24uYXBw&migrate=" + btoa(JSON.stringify({"Username":localStorage.getItem("username"),"Password":localStorage.getItem("password")}))
+                    }
+                } else {
+                    if (localStorage.getItem('modalVersion') != Version.slice(0, 7)) {
+                        document.getElementById('newVersion').show();
+                    }
+                    var statusReturn = apiRequest("+https://api.milnm.com/account/validatetoken", "POST", true, localStorage.getItem("token"));
+                    statusReturn.then(function (name) {
+                        localStorage.setItem("username", name);
+                        document.getElementById("usernameacc").textContent = localStorage.getItem("username");
+                        var scpt = document.createElement("script");
+                        scpt.src = "/assets/script/script.js?v=" + Version;
+                        document.body.appendChild(scpt);
+                    })
+                }
+            } else {
+                localStorage.setItem("token", params.get("code"));
+                location = "/"
+            }
+        }
+        // API
+        function apiRequest(endpoint, type, async, send, withstatus) {
+            return new Promise((resolve, reject) => {
+                const xhr = new XMLHttpRequest();
+                if (endpoint.charAt(0) == "+") {
+                    xhr.open(type, endpoint.substring(1), async);
+                } else {
+                    xhr.open(type, "https://api.vyzon.app/" + endpoint, async);
+                }
+                xhr.setRequestHeader("token", localStorage.getItem("token"));
+                xhr.onload = function () {
+                    if (withstatus) {
+                        try {
+                            resolve({
+                                "data": JSON.parse(xhr.response),
+                                "status": xhr.status
+                            });
+                        } catch {
+                            resolve({
+                                "data": xhr.response,
+                                "status": xhr.status
+                            });
+                        }
+                    } else {
+                        try {
+                            resolve(JSON.parse(xhr.response))
+                        } catch {
+                            resolve(xhr.response);
+                        }
+                    }
+                }
+                xhr.onerror = function () {
+                    reject(new Error(`Client error.`));
+                }
+                xhr.send(send);
+            })
+        }
+
+        function logOut() {
+            localStorage.clear();
+            location.reload();
+        }
     </script>
 </html>

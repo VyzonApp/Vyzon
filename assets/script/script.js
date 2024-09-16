@@ -1,28 +1,8 @@
-window.onload = function () {
-    const params = new URL(location).searchParams;
-    if (params.get("code") == undefined) {
-        if (localStorage.getItem("token") == null) {
-            if (localStorage.getItem("password") == null) {
-                document.getElementById("loginNotice").show();
-            } else {
-                location = "https://milnm.com/auth.html?url=dnl6b24uYXBw&migrate=" + btoa(JSON.stringify({"Username":localStorage.getItem("username"),"Password":localStorage.getItem("password")}))
-            }
-        } else {
-            document.querySelector(".openinfo").style.display = "none";
-            if (localStorage.getItem('modalVersion') != Version.slice(0, 7)) {
-                document.getElementById('newVersion').show();
-            }
-            var statusReturn = apiRequest("+https://api.milnm.com/account/validatetoken", "POST", true, localStorage.getItem("token"));
-            statusReturn.then(function (name) {
-                localStorage.setItem("username", name);
-                document.getElementById("usernameacc").textContent = localStorage.getItem("username");
-            })
-        }
-    } else {
-        localStorage.setItem("token", params.get("code"));
-        location = "/"
-    }
-}
+document.querySelector(".openinfo").style.display = "none";
+
+ColorStyle = document.createElement('style');
+document.getElementById("profile").shadowRoot.appendChild(ColorStyle);
+
 if (navigator.userAgent.indexOf('AppleWebKit') != -1) {
     DateOffset = 0
 } else {
@@ -512,20 +492,6 @@ function deleteList() {
         getLists();
     }, 500);
 }
-
-function iconSelect(modal) {
-    document.getElementById(modal).close();
-    document.getElementById("tempreturnmodal").textContent = modal;
-    document.getElementById('iconSelect').show();
-}
-document.getElementById('iconSelect').onclose = function () {
-    document.getElementById(document.getElementById("tempreturnmodal").textContent).show();
-    document.getElementById("tempreturnmodal").textContent = "";
-}
-function returnIcon() {
-    document.getElementById(document.getElementById("tempreturnmodal").textContent + '-selectoricon').textContent = event.target.textContent;
-    document.getElementById('iconSelect').close();
-}
 function reload2() {
     var statusReturn = apiRequest("competition/get", "GET", true, "", true);
     statusReturn.then(function (status) {
@@ -552,6 +518,7 @@ function generateFriendElem(type, name) {
 
         button1.onclick = function () { acceptRequest() };
         button2.onclick = function () { declineRequest() };
+        username.onclick = function () { document.getElementById("friendList").close(); loadOtherProfile(name) }
 
         icon.textContent = "move_to_inbox"
         username.textContent = name;
@@ -576,6 +543,7 @@ function generateFriendElem(type, name) {
         username.classList.add("rname");
 
         button.onclick = function () { cancelRequest() };
+        username.onclick = function () { document.getElementById("friendList").close(); loadOtherProfile(name) }
 
         icon.textContent = "outbox"
         username.textContent = name;
@@ -613,6 +581,8 @@ function generateFriendElem(type, name) {
             document.getElementById("addList").show();
         }
         menui3.onclick = function () { removeFriend(name) }
+
+        username.onclick = function () { document.getElementById("friendList").close(); loadOtherProfile(name) }
 
         menuwrap.style.position = "relative";
         menu.anchor = "friendlisting-" + name;
@@ -1217,45 +1187,168 @@ function startWhiteboard() {
     }
 }
 
-// API
-function apiRequest(endpoint, type, async, send, withstatus) {
-    return new Promise((resolve, reject) => {
-        const xhr = new XMLHttpRequest();
-        if (endpoint.charAt(0) == "+") {
-            xhr.open(type, endpoint.substring(1), async);
+// Profiles
+function setupProfile(name, primary, secondary, about, font, owner) {
+    document.getElementById("accountoptions").style.display = "none";
+    document.getElementById("pfusername").textContent = name;
+    if (about != "" && about != undefined) {
+        document.querySelector("#pfabtme").style.display = "flex";
+        document.getElementById("pfabtme").textContent = about;
+    } else {
+        document.querySelector("#pfabtme").style.display = "none";
+    }
+    cosmeticColorChange(primary, secondary, font);
+    if (owner) {
+        document.querySelector("#profilebtn").style.display = "flex";
+        document.querySelector("#profilebtn md-icon").textContent = "edit";
+    } else {
+        document.querySelector("#profilebtn").style.display = "none";
+    }
+    document.getElementById("profile").show();
+}
+function loadUserProfile() {
+    TargetElem = event.target;
+    TargetElem.disabled = true;
+    var statusReturn = apiRequest("profile/get", "POST", true, localStorage.getItem("username"), true);
+    statusReturn.then(function (response) {
+        TargetElem.disabled = false;
+        var responseParsed = JSON.parse(JSON.stringify(response["data"]));
+        if (responseParsed == null) {
+            setupProfile(
+                localStorage.getItem("username"),
+                "",
+                "",
+                "",
+                "",
+                true
+            )
         } else {
-            xhr.open(type, "https://api.vyzon.app/" + endpoint, async);
+            setupProfile(
+                localStorage.getItem("username"),
+                responseParsed["primary"],
+                responseParsed["secondary"],
+                responseParsed["about"],
+                responseParsed["font"],
+                true
+            )
         }
-        xhr.setRequestHeader("token", localStorage.getItem("token"));
-        xhr.onload = function () {
-            if (withstatus) {
-                try {
-                    resolve({
-                        "data": JSON.parse(xhr.response),
-                        "status": xhr.status
-                    });
-                } catch {
-                    resolve({
-                        "data": xhr.response,
-                        "status": xhr.status
-                    });
-                }
-            } else {
-                try {
-                    resolve(JSON.parse(xhr.response))
-                } catch {
-                    resolve(xhr.response);
-                }
-            }
-        }
-        xhr.onerror = function () {
-            reject(new Error(`Client error.`));
-        }
-        xhr.send(send);
     })
 }
-
-function logOut() {
-    localStorage.clear();
-    location.reload();
+function loadOtherProfile(profile) {
+    var statusReturn = apiRequest("profile/get", "POST", true, profile, true);
+    statusReturn.then(function (response) {
+        var responseParsed = JSON.parse(JSON.stringify(response["data"]));
+        if (responseParsed == null) {
+            setupProfile(
+                profile,
+                "",
+                "",
+                "",
+                "",
+                false
+            )
+        } else {
+            setupProfile(
+                profile,
+                responseParsed["primary"],
+                responseParsed["secondary"],
+                responseParsed["about"],
+                responseParsed["font"],
+                false
+            )
+        }
+    })
+}
+function profileBtn() {
+    ProfileBtnText = document.querySelector("#profilebtn md-icon")
+    switch (ProfileBtnText.textContent) {
+        case "edit":
+            ProfileBtnText.textContent = "done";
+            document.getElementById("accountoptions").style.display = "flex";
+            document.getElementById("resetColorBtn").style.display = "unset";
+            document.getElementById("pfabtme").contentEditable = true;
+            document.getElementById("pfabtme").style.display = "flex";
+            break;
+        case "done":
+            ProfileBtnText.textContent = "edit";
+            document.getElementById("accountoptions").style.display = "none";
+            document.getElementById("resetColorBtn").style.display = "none";
+            document.getElementById("pfabtme").contentEditable = false;
+            apiRequest("profile/set", "POST", true, JSON.stringify({
+                "primary": document.getElementById("colorInputPrimary").value,
+                "secondary": document.getElementById("colorInputSecondary").value,
+                "about": document.getElementById("pfabtme").textContent,
+                "font": document.getElementById("fontInput").value
+            }));
+            if (document.getElementById("pfabtme").textContent == "") {
+                document.getElementById("pfabtme").style.display = "none";
+            }
+            break;
+    }
+}
+function cosmeticColorChange(primary, secondary, font) {
+    if (
+        (primary == "" && secondary == "") ||
+        (primary == undefined && secondary == undefined) ||
+        (primary == "#000000" && secondary == "#000000")
+    ) {
+        ColorStyle.innerHTML = "";
+        document.getElementById('profileStyle').innerHTML = "";
+    } else {
+        document.getElementById("colorInputPrimary").value = primary;
+        document.getElementById("colorInputSecondary").value = secondary;
+        ColorStyle.innerHTML = `
+            dialog .container {
+                background: linear-gradient(${primary}, ${secondary}) !important;
+                box-shadow: 0 5px 10px ${secondary}, 0 -5px 10px ${primary};
+            }
+            dialog .container::before {
+                background: rgba(0,0,0,0.5);
+            }
+        `
+        var style2 = document.getElementById('profileStyle');
+        style2.innerHTML = `
+            #profile {
+                --md-sys-color-primary: ${primary}
+            }
+            .profilebtn {
+                --md-sys-color-primary: ${secondary};
+            }
+        `
+    }
+    if (font != "") {
+        document.getElementById("pfusername").style.fontFamily = font;
+    } else {
+        document.getElementById("pfusername").style.fontFamily = "Roboto";
+    }
+    if (
+        font == "" ||
+        font == undefined
+    ) {
+        document.getElementById("pfusername").style.fontFamily = "Roboto";
+        document.getElementById("fontInput").value = "Roboto";
+    } else {
+        document.getElementById("pfusername").style.fontFamily = font;
+        var fontStyle = document.createElement("link");
+        fontStyle.href = "https://fonts.googleapis.com/css2?family=" + encodeURIComponent(font);
+        fontStyle.rel = "stylesheet";
+        document.querySelector("head").appendChild(fontStyle);
+        document.getElementById("fontInput").value = font;
+    }
+}
+function resetColors() {
+    event.preventDefault();
+    document.getElementById("colorInputPrimary").value = "#000000";
+    document.getElementById("colorInputSecondary").value = "#000000";
+    document.getElementById("fontInput").value = "";
+    cosmeticColorChange();
+}
+document.getElementById("colorInputPrimary").oninput = function () {
+    cosmeticColorChange(event.target.value, document.getElementById("colorInputSecondary").value, document.getElementById("fontInput").value);
+}
+document.getElementById("colorInputSecondary").oninput = function () {
+    cosmeticColorChange(document.getElementById("colorInputPrimary").value, event.target.value, document.getElementById("fontInput").value);
+}
+document.getElementById("fontInput").onblur = function () {
+    cosmeticColorChange( document.getElementById("colorInputPrimary").value, document.getElementById("colorInputSecondary").value, event.target.value);
 }

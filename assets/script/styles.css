@@ -352,6 +352,9 @@ md-menu {
     border-bottom: 1px solid var(--vyzon-outline);
     color: var(--vyzon-text);
 }
+.rname {
+    cursor: pointer;
+}
 .request md-filled-icon-button, .friend .menuwrap, .request md-icon-button {
     margin-left: auto;
 }
@@ -781,6 +784,92 @@ md-menu {
     font-size: 13px;
     font-family: "Roboto";
     color: var(--vyzon-text-soft-alt);
+}
+
+.profilebtn {
+    margin-left: auto;
+}
+#profile {
+    --md-sys-color-on-surface: white;
+    --md-sys-color-on-surface-variant: rgb(200,200,200);
+}
+#profile div[slot=headline] {
+    margin: 10px;
+    padding-bottom: 20px;
+    background: rgba(0,0,0,0.5);
+    display: flex;
+    align-items: center;
+    border-radius: 20px;
+    margin-bottom: -20px;
+}
+#pfabtme {
+    margin: -10px;
+    margin-top: 20px;
+    margin-bottom: -5px;
+    padding: 10px;
+    background: rgba(0,0,0,0.5);
+    display: flex;
+    align-items: center;
+    border-radius: 15px;
+    white-space: pre;
+}
+#pfabtme:focus {
+    outline: none;
+    border: none;
+}
+.accountoptions {
+    width: 100%;
+    display: none;
+    gap: 10px;
+    justify-content: center;
+    align-items: center;
+    margin-top: 20px;
+}
+.editColor {
+    padding: 0;
+    margin: 0;
+    border: none;
+    outline: none;
+    appearance: none;
+    -webkit-appearance: none;
+    width: 90px;
+    height: 40px;
+    border-radius: 10px;
+    cursor: pointer;
+}
+.editColor::-webkit-color-swatch-wrapper {
+    padding: 0;
+    border-radius: 10px;
+    background: none;
+}
+.editColor::-webkit-color-swatch {
+    border: none;
+    border-radius: 10px;
+}
+.editFont {
+    padding: 0;
+    margin: 0;
+    border: none;
+    outline: none;
+    background: rgba(0,0,0,0.5);
+    width: 90px;
+    height: 40px;
+    border-radius: 10px;
+    color: white;
+    font-family: "Roboto";
+    font-size: 14px;
+    text-align: center;
+}
+.colorOption {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 2px;
+}
+#resetColorBtn {
+    height: fit-content;
+    display: none;
 }
 
 /* Mobile */
